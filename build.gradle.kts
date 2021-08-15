@@ -34,7 +34,6 @@ kotlin {
         else -> throw GradleException("Host OS is not supported in Kotlin/Native.")
     }
 
-    
     sourceSets {
         val commonMain by getting
         val commonTest by getting {
