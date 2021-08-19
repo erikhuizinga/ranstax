@@ -5,7 +5,7 @@ package com.github.erikhuizinga.ranstax
  * @param stacks Must not be empty.
  * @property stacks The [Stacks][Stack] in this session.
  */
-class Session(var stacks: Collection<Stack>) {
+class Session(stacks: Collection<Stack>) {
     constructor(vararg stacks: Stack) : this(stacks.toList())
 
     init {
@@ -13,6 +13,7 @@ class Session(var stacks: Collection<Stack>) {
     }
 
     private var stack = NodeStack(stacks)
+    val stacks get() = stack.stacks
 
     /**
      * Take an item from a random stack.
@@ -23,7 +24,6 @@ class Session(var stacks: Collection<Stack>) {
     fun takeFromRandomStack(): Stack {
         val preStacks = stacks
         stack = nodeStackReducer(stack)
-        stacks = stack.stacks
         return stacks.minus(preStacks).single()
     }
 }
