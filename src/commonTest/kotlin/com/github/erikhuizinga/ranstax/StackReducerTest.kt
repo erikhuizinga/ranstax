@@ -1,6 +1,8 @@
 package com.github.erikhuizinga.ranstax
 
+import kotlin.random.Random
 import kotlin.test.Test
+import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 
@@ -59,7 +61,7 @@ class StackReducerTest {
     }
 
     @Test
-    fun decrementMultipleStacksDecrementsOneStack() {
+    fun multipleStacks_Reduction_DecrementsOneStack() {
         val nStacks = 5
         val preStacks = List(nStacks) { Stack(name = it.toString(), size = it + 1) }
         var nodeStack = NodeStack(preStacks)
@@ -73,5 +75,30 @@ class StackReducerTest {
         assertEquals(expected = nStacks - 1, actual = postStacks.intersect(preStacks).size)
         assertEquals(expected = thePreStack.size - 1, actual = thePostStack.size)
         assertEquals(expected = size - 1, actual = nodeStack.size)
+    }
+
+    @Test
+    fun multipleStacksWithControlledRandom_Reduction_DecrementsExpectedStacks() {
+        val random: Random = object : Random() {
+            override fun nextBits(bitCount: Int) = TODO()
+            override fun nextInt(until: Int) = 0
+        }
+        val reducer = nodeStackReducer(random)
+        val nStacks = 50
+        val stacks = List(nStacks) {
+            val size = it + 1
+            Stack(name = size.toString(), size = size)
+        }
+        var stack = NodeStack(stacks)
+        val expected = (1..nStacks).flatMap { n -> List(n) { n.toString() } }
+
+        val actual = List(stack.size) {
+            val preStacks = stack.stacks
+            stack = reducer(stack)
+            stack.stacks.minus(preStacks).single()
+        }.map(Stack::name)
+
+        assertContentEquals(expected, actual)
+        assertEquals(expected = 0, actual = stack.size)
     }
 }

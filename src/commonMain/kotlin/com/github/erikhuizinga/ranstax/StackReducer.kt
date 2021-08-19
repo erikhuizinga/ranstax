@@ -23,8 +23,9 @@ internal val nodeStackReducer = nodeStackReducer()
 internal fun nodeStackReducer(random: Random = Random.Default): StackReducer<NodeStack> =
     StackReducer { nodeStack ->
         check(nodeStack.size > 0) { "Cannot decrement a stack of size ${nodeStack.size}" }
-        val stacks = nodeStack.stacks
+        val stacks = nodeStack.stacks.toMutableList()
         val stackToReduce = stacks.flatMap { stack -> List(stack.size) { stack } }.random(random)
         val reducedStack = defaultStackReducer(stackToReduce)
-        NodeStack(stacks - stackToReduce + reducedStack)
+        stacks[stacks.indexOf(stackToReduce)] = reducedStack
+        NodeStack(stacks)
     }
