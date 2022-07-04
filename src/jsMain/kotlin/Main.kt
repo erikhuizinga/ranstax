@@ -98,35 +98,41 @@ private fun NewStackInput(
     var name by remember { mutableStateOf(defaultName) }
     var size by remember { mutableStateOf(defaultSize) }
 
+    fun Stack.validate() = isValid && name.isValidName()
+
+    val stack = Stack(name, size)
+
+    fun onNewStackAndResetState() {
+        onNewStack(stack)
+        name = defaultName
+        size = defaultSize
+    }
+
     Text("New stack 👉")
     Span({ style { paddingLeft(8.px) } }) {
-        TextInput(value = name) {
-            placeholder("enter a name")
-            onInput { name = it.value }
-        }
+        StackInput(
+            stack = stack,
+            onInput = { (newName, newSize) ->
+                name = newName
+                size = newSize
+            },
+            onSubmit = {
+                if (stack.validate()) {
+                    onNewStackAndResetState()
+                }
+            },
+        )
     }
-    Span({ style { paddingHorizontal(8.px) } }) {
-        val minSize = 0
-        val maxSize = Int.MAX_VALUE
-        NumberInput(value = size, min = minSize, max = maxSize) {
-            placeholder("size")
-            size(maxSize.toString().length)
-            onInput {
-                it.value?.toInt()?.takeIf { newSize -> newSize in minSize..maxSize }?.let { newSize -> size = newSize }
+    Span({ style { paddingLeft(4.px) } }) {
+        Button(attrs = {
+            if (stack.validate()) onClick {
+                onNewStackAndResetState()
+            } else {
+                disabled()
             }
+        }) {
+            Text("➕")
         }
-    }
-    Button(attrs = {
-        val newStack = Stack(name, size)
-        if (newStack.isValid && newStack.name.isValidName()) onClick {
-            name = defaultName
-            size = defaultSize
-            onNewStack(newStack)
-        } else {
-            disabled()
-        }
-    }) {
-        Text("➕")
     }
 }
 
