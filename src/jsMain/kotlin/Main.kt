@@ -65,14 +65,14 @@ fun main() {
             H3 {
                 Text("Stacks")
             }
-            Div({ style { paddingBottom(8.px) } }) {
+            Div {
+                StackList(stacks, stacksBeingEdited)
+            }
+            Div({ style { paddingTop(8.px) } }) {
                 NewStackInput(
                     isValidName = { stacks.none { it.name == trim() } },
                     onNewStack = { stacks += it },
                 )
-            }
-            Div({ style { paddingVertical(8.px) } }) {
-                StackList(stacks, stacksBeingEdited)
             }
         }
     }
@@ -84,7 +84,7 @@ private fun StackList(
     stacksBeingEdited: SnapshotStateList<Stack>,
 ) {
     if (stacks.isEmpty()) {
-        Text("No stacks, add one here 👆")
+        Text("No stacks, add one here 👇")
     }
     for (stack in stacks) {
         Div({ style { paddingVertical(4.px) } }) {
