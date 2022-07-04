@@ -51,9 +51,7 @@ fun main() {
                 )
             }
             Div({ style { paddingVertical(8.px) } }) {
-                StackList(
-                    stacks, stacksBeingEdited
-                )
+                StackList(stacks, stacksBeingEdited)
             }
         }
     }
@@ -81,7 +79,7 @@ private fun StackList(
                         },
                     )
                 } else {
-                    Stack(stack) { stacksBeingEdited += stack }
+                    EditableStack(stack) { stacksBeingEdited += stack }
                 }
             }
         }
@@ -169,7 +167,7 @@ private fun StackInput(
 }
 
 @Composable
-private fun Stack(
+private fun EditableStack(
     stack: Stack,
     onEdit: () -> Unit,
 ) {
@@ -177,8 +175,13 @@ private fun Stack(
         Text("✏️")
     }
     Span({ style { paddingLeft(8.px) } }) {
-        Text("${stack.name}: ${stack.size}")
+        Stack(stack)
     }
+}
+
+@Composable
+private fun Stack(stack: Stack) {
+    Text("${stack.name}: ${stack.size}")
 }
 
 @Composable
