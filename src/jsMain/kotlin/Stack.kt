@@ -6,5 +6,5 @@ data class Stack(
      * `true` if this stack is valid; `false` otherwise.
      * It is valid if its [name] is not empty and its [size] is not negative.
      */
-    val isValid get() = name.isNotEmpty() && size >= 0
+    val isValid get() = name.isNotBlank() && size >= 0
 }
