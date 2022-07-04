@@ -6,9 +6,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.web.events.SyntheticEvent
+import kotlin.math.max
 import kotlin.random.Random
+import org.jetbrains.compose.web.attributes.cols
 import org.jetbrains.compose.web.attributes.disabled
 import org.jetbrains.compose.web.attributes.placeholder
+import org.jetbrains.compose.web.attributes.rows
 import org.jetbrains.compose.web.attributes.size
 import org.jetbrains.compose.web.css.CSSNumeric
 import org.jetbrains.compose.web.css.StyleScope
@@ -25,6 +28,7 @@ import org.jetbrains.compose.web.dom.H3
 import org.jetbrains.compose.web.dom.NumberInput
 import org.jetbrains.compose.web.dom.Span
 import org.jetbrains.compose.web.dom.Text
+import org.jetbrains.compose.web.dom.TextArea
 import org.jetbrains.compose.web.dom.TextInput
 import org.jetbrains.compose.web.renderComposable
 import org.w3c.dom.events.EventTarget
@@ -32,13 +36,14 @@ import org.w3c.dom.events.KeyboardEvent
 
 fun main() {
     renderComposable(rootElementId = "ranstax") {
-        val stacks = remember { mutableStateListOf<Stack>() }
-        val stacksBeingEdited = remember { mutableStateListOf<Stack>() }
+        val stacks: SnapshotStateList<Stack> = remember { mutableStateListOf() }
+        val stacksBeingEdited: SnapshotStateList<Stack> = remember { mutableStateListOf() }
+        var lastDrawnStack: Stack? by remember { mutableStateOf(null) }
 
         // Debug stacks
         val northAmericaStack = Stack("North America", 180)
         stacks += northAmericaStack
-        stacksBeingEdited += northAmericaStack
+        // stacksBeingEdited += northAmericaStack
         stacks += Stack("Europe", 81)
         stacks += Stack("Oceania", 95)
 
@@ -48,11 +53,12 @@ fun main() {
                     val totalSize = stacks.sumOf { it.size }
                     if (totalSize > 0 && stacksBeingEdited.isEmpty()) onClick {
                         var chosenIndex = Random.nextInt(totalSize)
-                        val stack = stacks.first {
+                        val chosenStack = stacks.first {
                             chosenIndex -= it.size
                             chosenIndex < 0
                         }
-                        stacks[stacks.indexOf(stack)] = stack.copy(size = stack.size - 1)
+                        lastDrawnStack = chosenStack
+                        stacks[stacks.indexOf(chosenStack)] = chosenStack.copy(size = chosenStack.size - 1)
                     } else {
                         disabled()
                     }
@@ -60,6 +66,20 @@ fun main() {
             }) {
                 H2({ style { padding(8.px) } }) {
                     Text("DRAW")
+                }
+            }
+            lastDrawnStack?.let {
+                Span({ style { paddingLeft(8.px) } }) {
+                    val firstLine = "Drawn from:"
+                    val value = "$firstLine\n${it.name}"
+                    TextArea(value) {
+                        style { property("resize", "none") }
+                        disabled()
+                        val valueLines = value.split('\n')
+                        rows(valueLines.count())
+                        cols(max(valueLines.maxOf { it.length }, stacks.maxOf { (name) -> name.length }))
+                        contentEditable(false)
+                    }
                 }
             }
             H3 {
