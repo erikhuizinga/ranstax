@@ -62,28 +62,29 @@ private fun StackList(
     stacks: SnapshotStateList<Stack>,
     stacksBeingEdited: SnapshotStateList<Stack>,
 ) {
-    stacks.map<Stack, ComposableLambda> { stack ->
-        {
-            Div({ style { paddingVertical(4.px) } }) {
-                if (stack in stacksBeingEdited) {
-                    StackEditor(
-                        currentStack = stack,
-                        isValidName = { stacksBeingEdited.any { it.name == this } || stacks.none { it.name == this } },
-                        onSave = { savedStack ->
-                            stacksBeingEdited -= stack
-                            stacks[stacks.indexOf(stack)] = savedStack
-                        },
-                        onDelete = {
-                            stacksBeingEdited -= stack
-                            stacks -= stack
-                        },
-                    )
-                } else {
-                    EditableStack(stack) { stacksBeingEdited += stack }
-                }
+    if (stacks.isEmpty()) {
+        Text("No stacks, add one here 👆")
+    }
+    for (stack in stacks) {
+        Div({ style { paddingVertical(4.px) } }) {
+            if (stack in stacksBeingEdited) {
+                StackEditor(
+                    currentStack = stack,
+                    isValidName = { stacksBeingEdited.any { it.name == this } || stacks.none { it.name == this } },
+                    onSave = { savedStack ->
+                        stacksBeingEdited -= stack
+                        stacks[stacks.indexOf(stack)] = savedStack
+                    },
+                    onDelete = {
+                        stacksBeingEdited -= stack
+                        stacks -= stack
+                    },
+                )
+            } else {
+                EditableStack(stack) { stacksBeingEdited += stack }
             }
         }
-    }.ifEmpty { listOf<ComposableLambda> { Text("no stacks, add one here 👆") } }.forEach { Div { it() } }
+    }
 }
 
 @Composable
