@@ -28,8 +28,6 @@ import org.jetbrains.compose.web.renderComposable
 import org.w3c.dom.events.EventTarget
 import org.w3c.dom.events.KeyboardEvent
 
-typealias ComposableLambda = @Composable () -> Unit
-
 fun main() {
     renderComposable(rootElementId = "ranstax") {
         val stacks = remember { mutableStateListOf<Stack>() }
