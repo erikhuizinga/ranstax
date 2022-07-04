@@ -205,15 +205,15 @@ private fun StackEditor(
         Text("💾")
     }
     Span({ style { paddingHorizontal(8.px) } }) {
-        StackInput(
-            stack = stack,
-            onInput = { stack = it },
-            onSubmit = { stack.takeIf { it.validate() }?.run(Stack::trimmedName)?.let(onSave) },
-        )
+        Button({ onClick { onDelete() } }) {
+            Text("🗑")
+        }
     }
-    Button({ onClick { onDelete() } }) {
-        Text("🗑")
-    }
+    StackInput(
+        stack = stack,
+        onInput = { stack = it },
+        onSubmit = { stack.takeIf { it.validate() }?.run(Stack::trimmedName)?.let(onSave) },
+    )
 }
 
 fun StyleScope.paddingVertical(value: CSSNumeric) {
