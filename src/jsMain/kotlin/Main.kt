@@ -6,6 +6,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.web.events.SyntheticEvent
+import kotlin.random.Random
 import org.jetbrains.compose.web.attributes.disabled
 import org.jetbrains.compose.web.attributes.placeholder
 import org.jetbrains.compose.web.attributes.size
@@ -19,6 +20,7 @@ import org.jetbrains.compose.web.css.paddingTop
 import org.jetbrains.compose.web.css.px
 import org.jetbrains.compose.web.dom.Button
 import org.jetbrains.compose.web.dom.Div
+import org.jetbrains.compose.web.dom.H2
 import org.jetbrains.compose.web.dom.H3
 import org.jetbrains.compose.web.dom.NumberInput
 import org.jetbrains.compose.web.dom.Span
@@ -41,7 +43,28 @@ fun main() {
         stacks += Stack("Oceania", 95)
 
         Div({ style { padding(24.px) } }) {
-            H3 { Text("Stacks") }
+            Button({
+                style {
+                    val totalSize = stacks.sumOf { it.size }
+                    if (totalSize > 0 && stacksBeingEdited.isEmpty()) onClick {
+                        var chosenIndex = Random.nextInt(totalSize)
+                        val stack = stacks.first {
+                            chosenIndex -= it.size
+                            chosenIndex < 0
+                        }
+                        stacks[stacks.indexOf(stack)] = stack.copy(size = stack.size - 1)
+                    } else {
+                        disabled()
+                    }
+                }
+            }) {
+                H2({ style { padding(8.px) } }) {
+                    Text("DRAW")
+                }
+            }
+            H3 {
+                Text("Stacks")
+            }
             Div({ style { paddingBottom(8.px) } }) {
                 NewStackInput(
                     isValidName = { stacks.none { it.name == trim() } },
