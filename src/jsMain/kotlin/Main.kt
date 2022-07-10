@@ -13,14 +13,21 @@ import org.jetbrains.compose.web.attributes.disabled
 import org.jetbrains.compose.web.attributes.placeholder
 import org.jetbrains.compose.web.attributes.rows
 import org.jetbrains.compose.web.attributes.size
-import org.jetbrains.compose.web.css.CSSNumeric
-import org.jetbrains.compose.web.css.StyleScope
-import org.jetbrains.compose.web.css.padding
-import org.jetbrains.compose.web.css.paddingBottom
-import org.jetbrains.compose.web.css.paddingLeft
-import org.jetbrains.compose.web.css.paddingRight
-import org.jetbrains.compose.web.css.paddingTop
+import org.jetbrains.compose.web.css.AlignItems
+import org.jetbrains.compose.web.css.DisplayStyle
+import org.jetbrains.compose.web.css.FlexDirection
+import org.jetbrains.compose.web.css.Style
+import org.jetbrains.compose.web.css.StyleSheet
+import org.jetbrains.compose.web.css.alignItems
+import org.jetbrains.compose.web.css.boxSizing
+import org.jetbrains.compose.web.css.display
+import org.jetbrains.compose.web.css.flexDirection
+import org.jetbrains.compose.web.css.fontFamily
+import org.jetbrains.compose.web.css.height
+import org.jetbrains.compose.web.css.margin
+import org.jetbrains.compose.web.css.percent
 import org.jetbrains.compose.web.css.px
+import org.jetbrains.compose.web.css.whiteSpace
 import org.jetbrains.compose.web.dom.Button
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.H2
@@ -36,64 +43,117 @@ import org.w3c.dom.events.KeyboardEvent
 
 fun main() {
     renderComposable(rootElementId = "ranstax") {
-        val stacks: SnapshotStateList<Stack> = remember { mutableStateListOf() }
-        val stacksBeingEdited: SnapshotStateList<Stack> = remember { mutableStateListOf() }
-        var lastDrawnStack: Stack? by remember { mutableStateOf(null) }
+        Style(RanstaxStyle)
+        Layout(
+            { RanstaxHeader() },
+            { RanstaxApp() },
+        )
+    }
+}
 
-        // Debug stacks
-        val northAmericaStack = Stack("North America", 180)
-        stacks += northAmericaStack
-        // stacksBeingEdited += northAmericaStack
-        stacks += Stack("Europe", 81)
-        stacks += Stack("Oceania", 95)
+object RanstaxStyle : StyleSheet() {
+    init {
+        universal style {
+            boxSizing("border-box")
+            margin(0.px)
+        }
+        "html, body" style {
+            height(100.percent)
+        }
+    }
 
-        Div({ style { padding(24.px) } }) {
-            Button({
-                style {
-                    val totalSize = stacks.sumOf { it.size }
-                    if (totalSize > 0 && stacksBeingEdited.isEmpty()) onClick {
-                        var chosenIndex = Random.nextInt(totalSize)
-                        val chosenStack = stacks.first {
-                            chosenIndex -= it.size
-                            chosenIndex < 0
-                        }
-                        lastDrawnStack = chosenStack
-                        stacks[stacks.indexOf(chosenStack)] = chosenStack.copy(size = chosenStack.size - 1)
-                    } else {
-                        disabled()
-                    }
-                }
-            }) {
-                H2({ style { padding(8.px) } }) {
-                    Text("DRAW")
-                }
-            }
-            lastDrawnStack?.let {
-                Span({ style { paddingLeft(8.px) } }) {
-                    val firstLine = "Drawn from:"
-                    val value = "$firstLine\n${it.name}"
-                    TextArea(value) {
-                        style { property("resize", "none") }
-                        disabled()
-                        val valueLines = value.split('\n')
-                        rows(valueLines.count())
-                        cols(max(valueLines.maxOf { it.length }, stacks.maxOf { (name) -> name.length }))
-                        contentEditable(false)
-                    }
-                }
-            }
-            H3 {
-                Text("Stacks")
-            }
+    val layout by style {
+        display(DisplayStyle.Flex)
+        flexDirection(FlexDirection.Column)
+        alignItems(AlignItems.Center)
+        margin(0.px)
+        height(100.percent)
+    }
+}
+
+@Composable
+fun Layout(vararg composables: @Composable () -> Unit) {
+    Div({ style { classes(RanstaxStyle.layout) } }) {
+        composables.forEach { it() }
+    }
+}
+
+@Composable
+fun RanstaxHeader() {
+    Div({
+        style {
+            fontFamily("monospace")
+            whiteSpace("break-spaces")
+            margin(16.px)
+        }
+    }) {
+        ranstaxHeaders.random().lines().forEach {
             Div {
-                StackList(stacks, stacksBeingEdited)
+                Text(it)
             }
-            Div({ style { paddingTop(8.px) } }) {
-                NewStackInput(
-                    isValidName = { stacks.none { it.name == trim() } },
-                    onNewStack = { stacks += it },
-                )
+        }
+    }
+}
+
+@Composable
+private fun RanstaxApp() {
+    val stacks: SnapshotStateList<Stack> = remember { mutableStateListOf() }
+    val stacksBeingEdited: SnapshotStateList<Stack> = remember { mutableStateListOf() }
+    var lastDrawnStack: Stack? by remember { mutableStateOf(null) }
+
+    // Debug stacks
+    val northAmericaStack = Stack("North America", 180)
+    stacks += northAmericaStack
+    // stacksBeingEdited += northAmericaStack
+    stacks += Stack("Europe", 81)
+    stacks += Stack("Oceania", 95)
+
+    Div {
+        Button({
+            style {
+                val totalSize = stacks.sumOf { it.size }
+                if (totalSize > 0 && stacksBeingEdited.isEmpty()) onClick {
+                    var chosenIndex = Random.nextInt(totalSize)
+                    val chosenStack = stacks.first {
+                        chosenIndex -= it.size
+                        chosenIndex < 0
+                    }
+                    lastDrawnStack = chosenStack
+                    stacks[stacks.indexOf(chosenStack)] = chosenStack.copy(size = chosenStack.size - 1)
+                } else {
+                    disabled()
+                }
             }
+        }) {
+            H2 {
+                Text("DRAW")
+            }
+        }
+        lastDrawnStack?.let {
+            Span {
+                val firstLine = "Drawn from:"
+                val value = "$firstLine\n${it.name}"
+                TextArea(value) {
+                    style { property("resize", "none") }
+                    disabled()
+                    val valueLines = value.split('\n')
+                    rows(valueLines.count())
+                    cols(max(valueLines.maxOf { it.length }, stacks.maxOf { (name) -> name.length }))
+                    contentEditable(false)
+                }
+            }
+        }
+        H3 {
+            Text("Stacks")
+        }
+        Div {
+            StackList(stacks, stacksBeingEdited)
+        }
+        Div {
+            NewStackInput(
+                isValidName = { stacks.none { it.name == trim() } },
+                onNewStack = { stacks += it },
+            )
         }
     }
 }
@@ -107,7 +167,7 @@ private fun StackList(
         Text("No stacks, add one here 👇")
     }
     for (stack in stacks) {
-        Div({ style { paddingVertical(4.px) } }) {
+        Div {
             if (stack in stacksBeingEdited) {
                 StackEditor(
                     currentStack = stack,
@@ -149,7 +209,7 @@ private fun NewStackInput(
     }
 
     Text("New stack 👉")
-    Span({ style { paddingLeft(8.px) } }) {
+    Span {
         StackInput(
             stack = stack,
             onInput = { (newName, newSize) ->
@@ -163,7 +223,7 @@ private fun NewStackInput(
             },
         )
     }
-    Span({ style { paddingLeft(4.px) } }) {
+    Span {
         Button(attrs = {
             if (stack.validate()) onClick {
                 onNewStackAndResetState()
@@ -193,7 +253,7 @@ private fun StackInput(
         onInput { onInput(stack.copy(name = it.value)) }
         onKeyUp(submitListener)
     }
-    Span({ style { paddingLeft(4.px) } }) {
+    Span {
         val minSize = 0
         val maxSize = Int.MAX_VALUE
         NumberInput(value = stack.size, min = minSize, max = maxSize) {
@@ -216,7 +276,7 @@ private fun EditableStack(
     Button({ onClick { onEdit() } }) {
         Text("✏️")
     }
-    Span({ style { paddingLeft(8.px) } }) {
+    Span {
         Stack(stack)
     }
 }
@@ -247,7 +307,7 @@ private fun StackEditor(
     }) {
         Text("💾")
     }
-    Span({ style { paddingHorizontal(8.px) } }) {
+    Span {
         Button({ onClick { onDelete() } }) {
             Text("🗑")
         }
@@ -257,14 +317,4 @@ private fun StackEditor(
         onInput = { stack = it },
         onSubmit = { stack.takeIf { it.validate() }?.run(Stack::trimmedName)?.let(onSave) },
     )
-}
-
-fun StyleScope.paddingVertical(value: CSSNumeric) {
-    paddingTop(value)
-    paddingBottom(value)
-}
-
-fun StyleScope.paddingHorizontal(value: CSSNumeric) {
-    paddingLeft(value)
-    paddingRight(value)
 }
