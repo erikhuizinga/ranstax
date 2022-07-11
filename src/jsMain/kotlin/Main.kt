@@ -87,11 +87,7 @@ fun RanstaxHeader() {
             margin(16.px)
         }
     }) {
-        ranstaxHeaders.random().lines().forEach {
-            Div {
-                Text(it)
-            }
-        }
+        Text(ranstaxHeaders.random())
     }
 }
 
