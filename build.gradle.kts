@@ -1,7 +1,9 @@
 import org.jetbrains.compose.compose
 
 plugins {
-    kotlin("multiplatform") version "1.6.10"
+    val kotlinVersion = "1.6.10"
+    kotlin("multiplatform") version kotlinVersion
+    kotlin("plugin.serialization") version kotlinVersion
     id("org.jetbrains.compose") version "1.1.0"
 }
 
@@ -32,6 +34,7 @@ kotlin {
             dependencies {
                 implementation(compose.web.core)
                 implementation(compose.runtime)
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2")
             }
         }
         val jsTest by getting {
