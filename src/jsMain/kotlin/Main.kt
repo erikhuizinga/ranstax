@@ -41,6 +41,12 @@ import org.jetbrains.compose.web.renderComposable
 import org.w3c.dom.events.EventTarget
 import org.w3c.dom.events.KeyboardEvent
 
+private const val debug = true
+
+private fun log(m: String) {
+    if (debug) println(m)
+}
+
 fun main() {
     renderComposable(rootElementId = "ranstax") {
         Style(RanstaxStyle)
