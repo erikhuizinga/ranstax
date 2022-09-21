@@ -1,3 +1,6 @@
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class Stack(
     val name: String,
     val size: Int,

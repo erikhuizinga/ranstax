@@ -1,13 +1,16 @@
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.web.events.SyntheticEvent
 import kotlin.math.max
 import kotlin.random.Random
+import kotlinx.browser.localStorage
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import org.jetbrains.compose.web.attributes.cols
 import org.jetbrains.compose.web.attributes.disabled
 import org.jetbrains.compose.web.attributes.placeholder
@@ -40,6 +43,8 @@ import org.jetbrains.compose.web.dom.TextInput
 import org.jetbrains.compose.web.renderComposable
 import org.w3c.dom.events.EventTarget
 import org.w3c.dom.events.KeyboardEvent
+import org.w3c.dom.get
+import org.w3c.dom.set
 
 private const val debug = true
 
@@ -48,13 +53,46 @@ private fun log(m: String) {
 }
 
 fun main() {
+    if (debug) setupDebugStacks()
+
     renderComposable(rootElementId = "ranstax") {
         Style(RanstaxStyle)
+        var ranstaxState by remember { mutableStateOf(loadRanstaxState()) }
         Layout(
             { RanstaxHeader() },
-            { RanstaxApp() },
+            {
+                RanstaxApp(ranstaxState) { newRanstaxState ->
+                    storeRanstaxState(newRanstaxState)
+                    ranstaxState = newRanstaxState
+                }
+            },
         )
     }
+}
+
+private fun setupDebugStacks() {
+    if (loadRanstaxState().stacks.sumOf { it.size } == 0) {
+        val northAmericaStack = Stack("North America", 5)
+        val europeStack = Stack("Europe", 3)
+        val oceaniaStack = Stack("Oceania", 4)
+        val stacks = listOf(northAmericaStack, europeStack, oceaniaStack)
+        val stacksBeingEdited: List<Stack> = listOf(/* northAmericaStac*/)
+        storeRanstaxState(RanstaxState(stacks, stacksBeingEdited, null))
+    }
+}
+
+private const val RANSTAX_STATE_KEY = "RanstaxState"
+
+private fun storeRanstaxState(ranstaxState: RanstaxState) {
+    localStorage[RANSTAX_STATE_KEY] = Json.encodeToString(ranstaxState)
+    log("Stored $ranstaxState")
+}
+
+private fun loadRanstaxState(): RanstaxState {
+    val ranstaxState =
+        localStorage[RANSTAX_STATE_KEY]?.let(Json.Default::decodeFromString) ?: RanstaxState()
+    log("Read $ranstaxState")
+    return ranstaxState
 }
 
 object RanstaxStyle : StyleSheet() {
@@ -97,18 +135,22 @@ fun RanstaxHeader() {
     }
 }
 
-@Composable
-private fun RanstaxApp() {
-    val stacks: SnapshotStateList<Stack> = remember { mutableStateListOf() }
-    val stacksBeingEdited: SnapshotStateList<Stack> = remember { mutableStateListOf() }
-    var lastDrawnStack: Stack? by remember { mutableStateOf(null) }
+@Serializable
+private data class RanstaxState(
+    val stacks: List<Stack> = emptyList(),
+    val stacksBeingEdited: List<Stack> = emptyList(),
+    val lastDrawnStackName: String? = null,
+) {
+    init {
+        require(stacks.containsAll(stacksBeingEdited)) {
+            "stacks (${stacks.joinToString()}) must contain all stacksBeingEdited (${stacksBeingEdited.joinToString()}). Stacks not in stacks: " + (stacksBeingEdited - stacks.toSet()).joinToString()
+        }
+    }
+}
 
-    // Debug stacks
-    val northAmericaStack = Stack("North America", 180)
-    stacks += northAmericaStack
-    // stacksBeingEdited += northAmericaStack
-    stacks += Stack("Europe", 81)
-    stacks += Stack("Oceania", 95)
+@Composable
+private fun RanstaxApp(ranstaxState: RanstaxState, onNewRanstaxState: (RanstaxState) -> Unit) {
+    val (stacks, stacksBeingEdited, lastDrawnStackName) = ranstaxState
 
     Div {
         Button({
@@ -120,8 +162,18 @@ private fun RanstaxApp() {
                         chosenIndex -= it.size
                         chosenIndex < 0
                     }
-                    lastDrawnStack = chosenStack
-                    stacks[stacks.indexOf(chosenStack)] = chosenStack.copy(size = chosenStack.size - 1)
+                    onNewRanstaxState(
+                        ranstaxState.copy(
+                            stacks = stacks.map {
+                                if (it == chosenStack) {
+                                    chosenStack.copy(size = chosenStack.size - 1)
+                                } else {
+                                    it
+                                }
+                            },
+                            lastDrawnStackName = chosenStack.name,
+                        )
+                    )
                 } else {
                     disabled()
                 }
@@ -131,16 +183,18 @@ private fun RanstaxApp() {
                 Text("DRAW")
             }
         }
-        lastDrawnStack?.let {
+        lastDrawnStackName?.let {
             Span {
                 val firstLine = "Drawn from:"
-                val value = "$firstLine\n${it.name}"
+                val value = "$firstLine\n$it"
                 TextArea(value) {
                     style { property("resize", "none") }
                     disabled()
                     val valueLines = value.split('\n')
                     rows(valueLines.count())
-                    cols(max(valueLines.maxOf { it.length }, stacks.maxOf { (name) -> name.length }))
+                    cols(
+                        max(valueLines.maxOf { it.length }, stacks.maxOf { (name) -> name.length })
+                    )
                     contentEditable(false)
                 }
             }
@@ -149,12 +203,14 @@ private fun RanstaxApp() {
             Text("Stacks")
         }
         Div {
-            StackList(stacks, stacksBeingEdited)
+            StackList(ranstaxState, onNewRanstaxState)
         }
         Div {
             NewStackInput(
                 isValidName = { stacks.none { it.name == trim() } },
-                onNewStack = { stacks += it },
+                onNewStack = {
+                    onNewRanstaxState(ranstaxState.copy(stacks = ranstaxState.stacks + it))
+                },
             )
         }
     }
@@ -162,29 +218,45 @@ private fun RanstaxApp() {
 
 @Composable
 private fun StackList(
-    stacks: SnapshotStateList<Stack>,
-    stacksBeingEdited: SnapshotStateList<Stack>,
+    ranstaxState: RanstaxState,
+    onNewRanstaxState: (RanstaxState) -> Unit,
 ) {
+    val stacks = ranstaxState.stacks
     if (stacks.isEmpty()) {
         Text("No stacks, add one here 👇")
     }
     for (stack in stacks) {
         Div {
+            val stacksBeingEdited = ranstaxState.stacksBeingEdited
             if (stack in stacksBeingEdited) {
                 StackEditor(
                     currentStack = stack,
                     isValidName = { stacksBeingEdited.any { it.name == this } || stacks.none { it.name == this } },
                     onSave = { savedStack ->
-                        stacksBeingEdited -= stack
-                        stacks[stacks.indexOf(stack)] = savedStack
+                        onNewRanstaxState(
+                            ranstaxState.copy(
+                                stacks = stacks.map { if (it == stack) savedStack else it },
+                                stacksBeingEdited = stacksBeingEdited - stack
+                            )
+                        )
                     },
                     onDelete = {
-                        stacksBeingEdited -= stack
-                        stacks -= stack
+                        onNewRanstaxState(
+                            ranstaxState.copy(
+                                stacks = stacks - stack,
+                                stacksBeingEdited = stacksBeingEdited - stack
+                            )
+                        )
                     },
                 )
             } else {
-                EditableStack(stack) { stacksBeingEdited += stack }
+                EditableStack(stack) {
+                    onNewRanstaxState(
+                        ranstaxState.copy(
+                            stacksBeingEdited = stacksBeingEdited + stack
+                        )
+                    )
+                }
             }
         }
     }
