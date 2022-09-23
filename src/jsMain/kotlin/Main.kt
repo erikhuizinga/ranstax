@@ -6,7 +6,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.web.events.SyntheticEvent
 import kotlin.math.ceil
 import kotlin.math.log10
-import kotlin.math.max
 import kotlin.math.roundToInt
 import kotlin.random.Random
 import kotlinx.browser.localStorage
@@ -161,67 +160,16 @@ private fun RanstaxApp(ranstaxState: RanstaxState, onNewRanstaxState: (RanstaxSt
     val (stacks, stacksBeingEdited, lastDrawnStackNames) = ranstaxState
     Div(attrs = { style { classes(RanstaxStyle.app) } }) {
         Div {
-            Button({
-                style {
-                    val totalSize = stacks.sumOf { it.size }
-                    if (totalSize > 0 && stacksBeingEdited.isEmpty()) onClick {
-                        var chosenIndex = Random.nextInt(totalSize)
-                        val chosenStack = stacks.first {
-                            chosenIndex -= it.size
-                            chosenIndex < 0
-                        }
-                        onNewRanstaxState(
-                            ranstaxState.copy(
-                                stacks = stacks.map {
-                                    if (it == chosenStack) {
-                                        chosenStack.copy(size = chosenStack.size - 1)
-                                    } else {
-                                        it
-                                    }
-                                },
-                                lastDrawnStackNames = lastDrawnStackNames + chosenStack.name,
-                            )
-                        )
-                    } else {
-                        disabled()
-                    }
-                }
-            }) {
-                H2 {
-                    Text("DRAW")
-                }
-            }
+            DrawButton(
+                stacks,
+                stacksBeingEdited,
+                onNewRanstaxState,
+                ranstaxState,
+                lastDrawnStackNames,
+            )
         }
         Div {
-            if (lastDrawnStackNames.isNotEmpty()) {
-                Span {
-                    val numDigits = ceil(
-                        log10((stacks.sumOf { it.size } + lastDrawnStackNames.size + 1).toDouble())
-                    ).roundToInt()
-
-                    val indexedNames = lastDrawnStackNames.mapIndexed { index, lastDrawnStackName ->
-                        buildString {
-                            val indexString = (index + 1).toString()
-                            repeat(numDigits - indexString.length) { append("0") }
-                            append(indexString)
-                            append(": ")
-                            append(lastDrawnStackName)
-                        }
-                    }.reversed().joinToString(separator = "\n")
-                    val value = "Drawn from:\n$indexedNames"
-                    TextArea(value) {
-                        style { property("resize", "none") }
-                        disabled()
-                        val valueLines = value.split('\n')
-                        rows(valueLines.count())
-                        cols(
-                            max(valueLines.maxOf { it.length },
-                                stacks.maxOf { (name) -> name.length })
-                        )
-                        contentEditable(false)
-                    }
-                }
-            }
+            History(stacks, lastDrawnStackNames)
         }
         H3 {
             Text("Stacks")
@@ -236,6 +184,93 @@ private fun RanstaxApp(ranstaxState: RanstaxState, onNewRanstaxState: (RanstaxSt
                     onNewRanstaxState(ranstaxState.copy(stacks = ranstaxState.stacks + it))
                 },
             )
+        }
+    }
+}
+
+@Composable
+private fun DrawButton(
+    stacks: List<Stack>,
+    stacksBeingEdited: List<Stack>,
+    onNewRanstaxState: (RanstaxState) -> Unit,
+    ranstaxState: RanstaxState,
+    lastDrawnStackNames: List<String>,
+) {
+    Button({
+        style {
+            val totalSize = stacks.sumOf { it.size }
+            if (totalSize > 0 && stacksBeingEdited.isEmpty()) onClick {
+                var chosenIndex = Random.nextInt(totalSize)
+                val chosenStack = stacks.first {
+                    chosenIndex -= it.size
+                    chosenIndex < 0
+                }
+                onNewRanstaxState(
+                    ranstaxState.copy(
+                        stacks = stacks.map {
+                            if (it == chosenStack) {
+                                chosenStack.copy(size = chosenStack.size - 1)
+                            } else {
+                                it
+                            }
+                        },
+                        lastDrawnStackNames = lastDrawnStackNames + chosenStack.name,
+                    )
+                )
+            } else {
+                disabled()
+            }
+        }
+    }) {
+        H2 {
+            Text("DRAW")
+        }
+    }
+}
+
+@Composable
+private fun History(
+    stacks: List<Stack>,
+    lastDrawnStackNames: List<String>,
+) {
+    Span {
+        val indexLength =
+            ceil(
+                log10((stacks.sumOf { it.size } + lastDrawnStackNames.size + 1).toDouble())
+            ).roundToInt()
+
+        val indexTemplate = "\$index"
+        val nameTemplate = "\$name"
+
+        val indexedNameTemplate = "$indexTemplate: $nameTemplate"
+        val indexedNameTemplateLength = indexedNameTemplate
+            .replace(indexTemplate, "0".repeat(indexLength))
+            .replace(
+                nameTemplate,
+                (stacks.map { it.name } + lastDrawnStackNames.toSet()).toSet()
+                    .maxByOrNull { it.length } ?: ""
+            )
+            .length
+
+        val indexedNames = lastDrawnStackNames.mapIndexed { index, lastDrawnStackName ->
+            val indexString = (index + 1).toString()
+            indexedNameTemplate
+                .replace(
+                    indexTemplate,
+                    "0".repeat(indexLength - indexString.length) + indexString
+                )
+                .replace(nameTemplate, lastDrawnStackName)
+        }.reversed().joinToString(separator = "\n")
+
+        TextArea("Drew from:\n$indexedNames") {
+            style {
+                property("resize", "none")
+                property("overflow", "scroll")
+            }
+            disabled()
+            rows(8)
+            cols(indexedNameTemplateLength)
+            contentEditable(false)
         }
     }
 }
