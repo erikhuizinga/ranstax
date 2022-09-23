@@ -4,7 +4,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.web.events.SyntheticEvent
+import kotlin.math.ceil
+import kotlin.math.log10
 import kotlin.math.max
+import kotlin.math.roundToInt
 import kotlin.random.Random
 import kotlinx.browser.localStorage
 import kotlinx.serialization.Serializable
@@ -76,8 +79,8 @@ private fun setupDebugStacks() {
         val europeStack = Stack("Europe", 3)
         val oceaniaStack = Stack("Oceania", 4)
         val stacks = listOf(northAmericaStack, europeStack, oceaniaStack)
-        val stacksBeingEdited: List<Stack> = listOf(/* northAmericaStac*/)
-        storeRanstaxState(RanstaxState(stacks, stacksBeingEdited, null))
+        val stacksBeingEdited: List<Stack> = listOf(/* northAmericaStack */)
+        storeRanstaxState(RanstaxState(stacks, stacksBeingEdited))
     }
 }
 
@@ -113,6 +116,11 @@ object RanstaxStyle : StyleSheet() {
         margin(0.px)
         height(100.percent)
     }
+    val app by style {
+        display(DisplayStyle.Flex)
+        flexDirection(FlexDirection.Column)
+        alignItems(AlignItems.Normal)
+    }
 }
 
 @Composable
@@ -139,7 +147,7 @@ fun RanstaxHeader() {
 private data class RanstaxState(
     val stacks: List<Stack> = emptyList(),
     val stacksBeingEdited: List<Stack> = emptyList(),
-    val lastDrawnStackName: String? = null,
+    val lastDrawnStackNames: List<String> = emptyList(),
 ) {
     init {
         require(stacks.containsAll(stacksBeingEdited)) {
@@ -150,52 +158,68 @@ private data class RanstaxState(
 
 @Composable
 private fun RanstaxApp(ranstaxState: RanstaxState, onNewRanstaxState: (RanstaxState) -> Unit) {
-    val (stacks, stacksBeingEdited, lastDrawnStackName) = ranstaxState
-
-    Div {
-        Button({
-            style {
-                val totalSize = stacks.sumOf { it.size }
-                if (totalSize > 0 && stacksBeingEdited.isEmpty()) onClick {
-                    var chosenIndex = Random.nextInt(totalSize)
-                    val chosenStack = stacks.first {
-                        chosenIndex -= it.size
-                        chosenIndex < 0
-                    }
-                    onNewRanstaxState(
-                        ranstaxState.copy(
-                            stacks = stacks.map {
-                                if (it == chosenStack) {
-                                    chosenStack.copy(size = chosenStack.size - 1)
-                                } else {
-                                    it
-                                }
-                            },
-                            lastDrawnStackName = chosenStack.name,
+    val (stacks, stacksBeingEdited, lastDrawnStackNames) = ranstaxState
+    Div(attrs = { style { classes(RanstaxStyle.app) } }) {
+        Div {
+            Button({
+                style {
+                    val totalSize = stacks.sumOf { it.size }
+                    if (totalSize > 0 && stacksBeingEdited.isEmpty()) onClick {
+                        var chosenIndex = Random.nextInt(totalSize)
+                        val chosenStack = stacks.first {
+                            chosenIndex -= it.size
+                            chosenIndex < 0
+                        }
+                        onNewRanstaxState(
+                            ranstaxState.copy(
+                                stacks = stacks.map {
+                                    if (it == chosenStack) {
+                                        chosenStack.copy(size = chosenStack.size - 1)
+                                    } else {
+                                        it
+                                    }
+                                },
+                                lastDrawnStackNames = lastDrawnStackNames + chosenStack.name,
+                            )
                         )
-                    )
-                } else {
-                    disabled()
+                    } else {
+                        disabled()
+                    }
+                }
+            }) {
+                H2 {
+                    Text("DRAW")
                 }
             }
-        }) {
-            H2 {
-                Text("DRAW")
-            }
         }
-        lastDrawnStackName?.let {
-            Span {
-                val firstLine = "Drawn from:"
-                val value = "$firstLine\n$it"
-                TextArea(value) {
-                    style { property("resize", "none") }
-                    disabled()
-                    val valueLines = value.split('\n')
-                    rows(valueLines.count())
-                    cols(
-                        max(valueLines.maxOf { it.length }, stacks.maxOf { (name) -> name.length })
-                    )
-                    contentEditable(false)
+        Div {
+            if (lastDrawnStackNames.isNotEmpty()) {
+                Span {
+                    val numDigits = ceil(
+                        log10((stacks.sumOf { it.size } + lastDrawnStackNames.size + 1).toDouble())
+                    ).roundToInt()
+
+                    val indexedNames = lastDrawnStackNames.mapIndexed { index, lastDrawnStackName ->
+                        buildString {
+                            val indexString = (index + 1).toString()
+                            repeat(numDigits - indexString.length) { append("0") }
+                            append(indexString)
+                            append(": ")
+                            append(lastDrawnStackName)
+                        }
+                    }.reversed().joinToString(separator = "\n")
+                    val value = "Drawn from:\n$indexedNames"
+                    TextArea(value) {
+                        style { property("resize", "none") }
+                        disabled()
+                        val valueLines = value.split('\n')
+                        rows(valueLines.count())
+                        cols(
+                            max(valueLines.maxOf { it.length },
+                                stacks.maxOf { (name) -> name.length })
+                        )
+                        contentEditable(false)
+                    }
                 }
             }
         }
