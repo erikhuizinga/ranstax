@@ -89,15 +89,10 @@ private const val RANSTAX_STATE_KEY = "RanstaxState"
 
 private fun storeRanstaxState(ranstaxState: RanstaxState) {
     localStorage[RANSTAX_STATE_KEY] = Json.encodeToString(ranstaxState)
-    log("Stored $ranstaxState")
 }
 
-private fun loadRanstaxState(): RanstaxState {
-    val ranstaxState =
-        localStorage[RANSTAX_STATE_KEY]?.let(Json.Default::decodeFromString) ?: RanstaxState()
-    log("Read $ranstaxState")
-    return ranstaxState
-}
+private fun loadRanstaxState(): RanstaxState =
+    localStorage[RANSTAX_STATE_KEY]?.let(Json.Default::decodeFromString) ?: RanstaxState()
 
 object RanstaxStyle : StyleSheet() {
     init {
