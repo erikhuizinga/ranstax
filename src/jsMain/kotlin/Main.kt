@@ -9,6 +9,7 @@ import kotlin.math.log10
 import kotlin.math.roundToInt
 import kotlin.random.Random
 import kotlinx.browser.localStorage
+import kotlinx.browser.window
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
@@ -184,6 +185,9 @@ private fun RanstaxApp(ranstaxState: RanstaxState, onNewRanstaxState: (RanstaxSt
                     onNewRanstaxState(ranstaxState.copy(stacks = ranstaxState.stacks + it))
                 },
             )
+        }
+        Div {
+            ResetButton { onNewRanstaxState(RanstaxState()) }
         }
     }
 }
@@ -450,4 +454,23 @@ private fun StackEditor(
         onInput = { stack = it },
         onSubmit = { stack.takeIf { it.validate() }?.run(Stack::trimmedName)?.let(onSave) },
     )
+}
+
+@Composable
+fun ResetButton(onReset: () -> Unit) {
+    Button(attrs = {
+        style {
+            onClick {
+                if (window.confirm(
+                        "Do you really want to reset all data?" +
+                                " If you choose to reset, you will lose all current data."
+                    )
+                ) {
+                    onReset()
+                }
+            }
+        }
+    }) {
+        Text("🆕 Reset")
+    }
 }
