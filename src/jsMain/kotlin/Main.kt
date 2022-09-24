@@ -6,6 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.web.events.SyntheticEvent
 import kotlin.math.ceil
 import kotlin.math.log10
+import kotlin.math.min
 import kotlin.math.roundToInt
 import kotlin.random.Random
 import kotlinx.browser.localStorage
@@ -154,6 +155,8 @@ private data class RanstaxState(
             "stacks (${stacks.joinToString()}) must contain all stacksBeingEdited (${stacksBeingEdited.joinToString()}). Stacks not in stacks: " + (stacksBeingEdited - stacks.toSet()).joinToString()
         }
     }
+
+    val isDrawButtonEnabled = stacks.sumOf { it.size } > 0 && stacksBeingEdited.isEmpty()
 }
 
 @Composable
@@ -170,7 +173,7 @@ private fun RanstaxApp(ranstaxState: RanstaxState, onNewRanstaxState: (RanstaxSt
             )
         }
         Div {
-            History(stacks, lastDrawnStackNames)
+            History(ranstaxState)
         }
         H3 {
             Text("Stacks")
@@ -233,49 +236,54 @@ private fun DrawButton(
 }
 
 @Composable
-private fun History(
-    stacks: List<Stack>,
-    lastDrawnStackNames: List<String>,
-) {
-    Span {
+private fun History(ranstaxState: RanstaxState) {
+    val (stacks, _, lastDrawnStackNames) = ranstaxState
+    if (lastDrawnStackNames.isEmpty()) {
+        if (ranstaxState.isDrawButtonEnabled) {
+            HistoryHeader()
+            Text(
+                "👆 Draw to start history"
+            )
+        }
+    } else {
+        HistoryHeader()
         val indexLength =
-            ceil(
-                log10((stacks.sumOf { it.size } + lastDrawnStackNames.size + 1).toDouble())
-            ).roundToInt()
+            ceil(log10((stacks.sumOf { it.size } + lastDrawnStackNames.size + 1).toDouble())).roundToInt()
 
         val indexTemplate = "\$index"
         val nameTemplate = "\$name"
 
         val indexedNameTemplate = "$indexTemplate: $nameTemplate"
-        val indexedNameTemplateLength = indexedNameTemplate
-            .replace(indexTemplate, "0".repeat(indexLength))
-            .replace(
-                nameTemplate,
-                (stacks.map { it.name } + lastDrawnStackNames.toSet()).toSet()
-                    .maxByOrNull { it.length } ?: ""
-            )
-            .length
+        val indexedNameTemplateLength =
+            indexedNameTemplate.replace(indexTemplate, "0".repeat(indexLength))
+                .replace(nameTemplate,
+                    (stacks.map { it.name } + lastDrawnStackNames.toSet()).toSet()
+                        .maxByOrNull { it.length } ?: "").length
 
         val indexedNames = lastDrawnStackNames.mapIndexed { index, lastDrawnStackName ->
             val indexString = (index + 1).toString()
-            indexedNameTemplate
-                .replace(
-                    indexTemplate,
-                    "0".repeat(indexLength - indexString.length) + indexString
-                )
-                .replace(nameTemplate, lastDrawnStackName)
+            indexedNameTemplate.replace(
+                indexTemplate, "0".repeat(indexLength - indexString.length) + indexString
+            ).replace(nameTemplate, lastDrawnStackName)
         }.reversed().joinToString(separator = "\n")
 
-        TextArea("Drew from:\n$indexedNames") {
+        TextArea(indexedNames) {
             style {
                 property("resize", "none")
                 property("overflow", "scroll")
             }
             disabled()
-            rows(8)
+            rows(min(lastDrawnStackNames.size, 7))
             cols(indexedNameTemplateLength)
             contentEditable(false)
         }
+    }
+}
+
+@Composable
+private fun HistoryHeader() {
+    H3 {
+        Text("History")
     }
 }
 
