@@ -1,4 +1,5 @@
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -9,42 +10,54 @@ import kotlin.math.log10
 import kotlin.math.min
 import kotlin.math.roundToInt
 import kotlin.random.Random
+import kotlinx.browser.document
 import kotlinx.browser.localStorage
 import kotlinx.browser.window
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import org.jetbrains.compose.web.attributes.cols
 import org.jetbrains.compose.web.attributes.disabled
 import org.jetbrains.compose.web.attributes.placeholder
-import org.jetbrains.compose.web.attributes.rows
 import org.jetbrains.compose.web.attributes.size
 import org.jetbrains.compose.web.css.AlignItems
+import org.jetbrains.compose.web.css.Color
 import org.jetbrains.compose.web.css.DisplayStyle
 import org.jetbrains.compose.web.css.FlexDirection
+import org.jetbrains.compose.web.css.LineStyle
 import org.jetbrains.compose.web.css.Style
 import org.jetbrains.compose.web.css.StyleSheet
 import org.jetbrains.compose.web.css.alignItems
+import org.jetbrains.compose.web.css.border
+import org.jetbrains.compose.web.css.borderRadius
 import org.jetbrains.compose.web.css.boxSizing
 import org.jetbrains.compose.web.css.display
+import org.jetbrains.compose.web.css.em
 import org.jetbrains.compose.web.css.flexDirection
 import org.jetbrains.compose.web.css.fontFamily
 import org.jetbrains.compose.web.css.height
 import org.jetbrains.compose.web.css.margin
+import org.jetbrains.compose.web.css.maxHeight
+import org.jetbrains.compose.web.css.overflowY
+import org.jetbrains.compose.web.css.padding
+import org.jetbrains.compose.web.css.paddingBottom
+import org.jetbrains.compose.web.css.paddingLeft
+import org.jetbrains.compose.web.css.paddingRight
+import org.jetbrains.compose.web.css.paddingTop
 import org.jetbrains.compose.web.css.percent
 import org.jetbrains.compose.web.css.px
 import org.jetbrains.compose.web.css.whiteSpace
+import org.jetbrains.compose.web.dom.AttrBuilderContext
 import org.jetbrains.compose.web.dom.Button
 import org.jetbrains.compose.web.dom.Div
-import org.jetbrains.compose.web.dom.H2
 import org.jetbrains.compose.web.dom.H3
 import org.jetbrains.compose.web.dom.NumberInput
+import org.jetbrains.compose.web.dom.Small
 import org.jetbrains.compose.web.dom.Span
 import org.jetbrains.compose.web.dom.Text
-import org.jetbrains.compose.web.dom.TextArea
 import org.jetbrains.compose.web.dom.TextInput
 import org.jetbrains.compose.web.renderComposable
+import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.events.EventTarget
 import org.w3c.dom.events.KeyboardEvent
 import org.w3c.dom.get
@@ -76,9 +89,9 @@ fun main() {
 
 private fun setupDebugStacks() {
     if (loadRanstaxState().stacks.sumOf { it.size } == 0) {
-        val northAmericaStack = Stack("North America", 5)
-        val europeStack = Stack("Europe", 3)
-        val oceaniaStack = Stack("Oceania", 4)
+        val northAmericaStack = Stack("North America", 180)
+        val europeStack = Stack("Europe", 81)
+        val oceaniaStack = Stack("Oceania", 95)
         val stacks = listOf(northAmericaStack, europeStack, oceaniaStack)
         val stacksBeingEdited: List<Stack> = listOf(/* northAmericaStack */)
         storeRanstaxState(RanstaxState(stacks, stacksBeingEdited))
@@ -112,18 +125,54 @@ object RanstaxStyle : StyleSheet() {
         margin(0.px)
         height(100.percent)
     }
-    val app by style {
+    val column by style {
         display(DisplayStyle.Flex)
         flexDirection(FlexDirection.Column)
         alignItems(AlignItems.Normal)
+    }
+    val row by style {
+        display(DisplayStyle.Flex)
+        flexDirection(FlexDirection.Row)
+        alignItems(AlignItems.Normal)
+    }
+    val columnContainer by style {
+        paddingTop(2.px)
+        paddingBottom(2.px)
+    }
+    val rowContainer by style {
+        paddingLeft(2.px)
+        paddingRight(2.px)
+    }
+    val history by style {
+        fontFamily("monospace")
+        border(1.px, LineStyle.Solid, Color.lightgray)
+        borderRadius(2.px)
+        maxHeight(16.em)
+        overflowY("scroll")
+        padding(8.px)
     }
 }
 
 @Composable
 fun Layout(vararg composables: @Composable () -> Unit) {
     Div({ style { classes(RanstaxStyle.layout) } }) {
-        composables.forEach { it() }
+        Column(*composables)
     }
+}
+
+@Composable
+fun ColumnContainer(child: @Composable () -> Unit) {
+    Container({ style { classes(RanstaxStyle.columnContainer) } }, child)
+}
+
+@Composable
+fun RowContainer(child: @Composable () -> Unit) {
+    Container({ style { classes(RanstaxStyle.rowContainer) } }, child)
+}
+
+@Composable
+fun Container(attrs: AttrBuilderContext<HTMLDivElement>? = null, child: @Composable () -> Unit) {
+    Div(attrs) { child() }
 }
 
 @Composable
@@ -144,6 +193,7 @@ private data class RanstaxState(
     val stacks: List<Stack> = emptyList(),
     val stacksBeingEdited: List<Stack> = emptyList(),
     val lastDrawnStackNames: List<String> = emptyList(),
+    val isEditing: Boolean = false,
 ) {
     init {
         require(stacks.containsAll(stacksBeingEdited)) {
@@ -156,129 +206,150 @@ private data class RanstaxState(
 
 @Composable
 private fun RanstaxApp(ranstaxState: RanstaxState, onNewRanstaxState: (RanstaxState) -> Unit) {
-    val (stacks, stacksBeingEdited, lastDrawnStackNames) = ranstaxState
-    Div(attrs = { style { classes(RanstaxStyle.app) } }) {
-        Div {
-            DrawButton(
-                stacks,
-                stacksBeingEdited,
-                onNewRanstaxState,
-                ranstaxState,
-                lastDrawnStackNames,
-            )
+    val stacks = ranstaxState.stacks
+
+    document.onkeyup = { event ->
+        if (!ranstaxState.isEditing && ranstaxState.isDrawButtonEnabled && event.key in "0".."9") {
+            onDraw(event.key.toInt(), ranstaxState, onNewRanstaxState)
+            event.preventDefault()
         }
-        Div {
-            History(ranstaxState)
-        }
-        H3 {
-            Text("Stacks")
-        }
-        Div {
-            StackList(ranstaxState, onNewRanstaxState)
-        }
-        Div {
+    }
+
+    val onEditingChange = { isEditing: Boolean ->
+        onNewRanstaxState(ranstaxState.copy(isEditing = isEditing))
+    }
+    Column(
+        { DrawButton(ranstaxState) { onDraw(1, ranstaxState, onNewRanstaxState) } },
+        { History(ranstaxState) },
+        { StackList(ranstaxState, onNewRanstaxState, onEditingChange) },
+        {
             NewStackInput(
                 isValidName = { stacks.none { it.name == trim() } },
                 onNewStack = {
-                    onNewRanstaxState(ranstaxState.copy(stacks = ranstaxState.stacks + it))
+                    onNewRanstaxState(ranstaxState.copy(stacks = stacks + it))
                 },
+                onEditingChange = onEditingChange,
             )
+        },
+        { Reset { onNewRanstaxState(RanstaxState()) } },
+    )
+}
+
+private fun onDraw(
+    numToDraw: Int,
+    ranstaxState: RanstaxState,
+    onNewRanstaxState: (RanstaxState) -> Unit,
+) {
+    var newRanstaxState = ranstaxState
+    val theNumToDraw = min(numToDraw, ranstaxState.stacks.sumOf { it.size })
+    repeat(theNumToDraw) {
+        val stacks = newRanstaxState.stacks
+        var chosenIndex = Random.nextInt(stacks.sumOf { it.size })
+        val chosenStack = stacks.first {
+            chosenIndex -= it.size
+            chosenIndex < 0
         }
-        Div {
-            ResetButton { onNewRanstaxState(RanstaxState()) }
-        }
+        newRanstaxState = newRanstaxState.copy(
+            stacks = stacks.map {
+                if (it == chosenStack) {
+                    chosenStack.copy(size = chosenStack.size - 1)
+                } else {
+                    it
+                }
+            },
+            lastDrawnStackNames = newRanstaxState.lastDrawnStackNames + chosenStack.name,
+        )
+    }
+    onNewRanstaxState(newRanstaxState)
+}
+
+@Composable
+fun Column(vararg composables: @Composable () -> Unit) {
+    Div({ style { classes(RanstaxStyle.column) } }) {
+        composables.forEach { ColumnContainer(it) }
+    }
+}
+
+@Composable
+fun Column(composables: List<@Composable () -> Unit>) {
+    Column(*composables.toTypedArray())
+}
+
+@Composable
+fun Row(vararg composables: @Composable () -> Unit) {
+    Div({ style { classes(RanstaxStyle.row) } }) {
+        composables.forEach { RowContainer(it) }
     }
 }
 
 @Composable
 private fun DrawButton(
-    stacks: List<Stack>,
-    stacksBeingEdited: List<Stack>,
-    onNewRanstaxState: (RanstaxState) -> Unit,
     ranstaxState: RanstaxState,
-    lastDrawnStackNames: List<String>,
+    onDraw: () -> Unit,
 ) {
-    Button({
-        style {
-            val totalSize = stacks.sumOf { it.size }
-            if (totalSize > 0 && stacksBeingEdited.isEmpty()) onClick {
-                var chosenIndex = Random.nextInt(totalSize)
-                val chosenStack = stacks.first {
-                    chosenIndex -= it.size
-                    chosenIndex < 0
+    Row(
+        {
+            Button({
+                style {
+                    if (ranstaxState.isDrawButtonEnabled) onClick {
+                        onDraw()
+                    } else {
+                        disabled()
+                    }
                 }
-                onNewRanstaxState(
-                    ranstaxState.copy(
-                        stacks = stacks.map {
-                            if (it == chosenStack) {
-                                chosenStack.copy(size = chosenStack.size - 1)
-                            } else {
-                                it
-                            }
-                        },
-                        lastDrawnStackNames = lastDrawnStackNames + chosenStack.name,
-                    )
-                )
-            } else {
-                disabled()
             }
-        }
-    }) {
-        H2 {
-            Text("DRAW")
-        }
-    }
+            ) {
+                H3 {
+                    Text("DRAW")
+                }
+            }
+        },
+        {
+            Small {
+                Text("ℹ️ press any number key to draw that many items")
+            }
+        },
+    )
 }
 
 @Composable
+//TODO Add user action to history
 private fun History(ranstaxState: RanstaxState) {
     val (stacks, _, lastDrawnStackNames) = ranstaxState
     if (lastDrawnStackNames.isEmpty()) {
         if (ranstaxState.isDrawButtonEnabled) {
-            HistoryHeader()
             Text(
                 "👆 Draw to start history"
             )
         }
     } else {
-        HistoryHeader()
-        val indexLength =
-            ceil(log10((stacks.sumOf { it.size } + lastDrawnStackNames.size + 1).toDouble())).roundToInt()
-
-        val indexTemplate = "\$index"
-        val nameTemplate = "\$name"
-
-        val indexedNameTemplate = "$indexTemplate: $nameTemplate"
-        val indexedNameTemplateLength =
-            indexedNameTemplate.replace(indexTemplate, "0".repeat(indexLength))
-                .replace(nameTemplate,
-                    (stacks.map { it.name } + lastDrawnStackNames.toSet()).toSet()
-                        .maxByOrNull { it.length } ?: "").length
-
-        val indexedNames = lastDrawnStackNames.mapIndexed { index, lastDrawnStackName ->
-            val indexString = (index + 1).toString()
-            indexedNameTemplate.replace(
-                indexTemplate, "0".repeat(indexLength - indexString.length) + indexString
-            ).replace(nameTemplate, lastDrawnStackName)
-        }.reversed().joinToString(separator = "\n")
-
-        TextArea(indexedNames) {
-            style {
-                property("resize", "none")
-                property("overflow", "scroll")
-            }
-            disabled()
-            rows(min(lastDrawnStackNames.size, 7))
-            cols(indexedNameTemplateLength)
-            contentEditable(false)
+        H3 {
+            Text("📜 History")
         }
-    }
-}
 
-@Composable
-private fun HistoryHeader() {
-    H3 {
-        Text("History")
+        Div({ style { classes(RanstaxStyle.history) } }) {
+            DisposableEffect(lastDrawnStackNames.size) {
+                scopeElement.apply { scrollTop = scrollHeight.toDouble() }
+                onDispose {}
+            }
+
+            val indexTemplate = "\$index"
+            val nameTemplate = "\$name"
+            val indexedNameTemplate = "$indexTemplate: $nameTemplate"
+            val indexLength =
+                ceil(log10((stacks.sumOf { it.size } + lastDrawnStackNames.size + 1).toDouble())).roundToInt()
+            lastDrawnStackNames.mapIndexed { index, lastDrawnStackName ->
+                val indexString = (index + 1).toString()
+                indexedNameTemplate.replace(
+                    indexTemplate,
+                    "0".repeat(indexLength - indexString.length) + indexString
+                ).replace(nameTemplate, lastDrawnStackName)
+            }.forEach {
+                Div {
+                    Text(it)
+                }
+            }
+        }
     }
 }
 
@@ -286,52 +357,64 @@ private fun HistoryHeader() {
 private fun StackList(
     ranstaxState: RanstaxState,
     onNewRanstaxState: (RanstaxState) -> Unit,
+    onEditingChange: (isEditing: Boolean) -> Unit,
 ) {
     val stacks = ranstaxState.stacks
     if (stacks.isEmpty()) {
-        Text("No stacks, add one here 👇")
+        Text("No stacks, add some new ones")
+        return
     }
-    for (stack in stacks) {
-        Div {
-            val stacksBeingEdited = ranstaxState.stacksBeingEdited
-            if (stack in stacksBeingEdited) {
-                StackEditor(
-                    currentStack = stack,
-                    isValidName = { stacksBeingEdited.any { it.name == this } || stacks.none { it.name == this } },
-                    onSave = { savedStack ->
-                        onNewRanstaxState(
-                            ranstaxState.copy(
-                                stacks = stacks.map { if (it == stack) savedStack else it },
-                                stacksBeingEdited = stacksBeingEdited - stack
+    H3 {
+        Text("📚 Stacks")
+    }
+    val stacksBeingEdited = ranstaxState.stacksBeingEdited
+    Column(
+        stacks.map<Stack, @Composable () -> Unit> { stack ->
+            {
+                if (stack in stacksBeingEdited) {
+                    StackEditor(
+                        currentStack = stack,
+                        isValidName = {
+                            val trimmedName = trim()
+                            stacksBeingEdited.any { it.name == trimmedName } || stacks.none { it.name == trimmedName }
+                        },
+                        onSave = { savedStack ->
+                            onNewRanstaxState(
+                                ranstaxState.copy(
+                                    stacks = stacks.map { if (it == stack) savedStack else it },
+                                    stacksBeingEdited = stacksBeingEdited - stack
+                                )
                             )
-                        )
-                    },
-                    onDelete = {
-                        onNewRanstaxState(
-                            ranstaxState.copy(
-                                stacks = stacks - stack,
-                                stacksBeingEdited = stacksBeingEdited - stack
+                        },
+                        onDelete = {
+                            onNewRanstaxState(
+                                ranstaxState.copy(
+                                    stacks = stacks - stack,
+                                    stacksBeingEdited = stacksBeingEdited - stack
+                                )
                             )
-                        )
-                    },
-                )
-            } else {
-                EditableStack(stack) {
-                    onNewRanstaxState(
-                        ranstaxState.copy(
-                            stacksBeingEdited = stacksBeingEdited + stack
-                        )
+                        },
+                        onEditingChange = onEditingChange,
                     )
+                } else {
+                    EditableStack(stack) {
+                        onNewRanstaxState(
+                            ranstaxState.copy(
+                                stacksBeingEdited = stacksBeingEdited + stack
+                            )
+                        )
+                    }
                 }
             }
         }
-    }
+    )
 }
 
 @Composable
 private fun NewStackInput(
     isValidName: String.() -> Boolean,
     onNewStack: (newStack: Stack) -> Unit,
+    onEditingChange: (isEditing: Boolean) -> Unit,
 ) {
     val defaultName = ""
     val defaultSize = 10
@@ -343,12 +426,14 @@ private fun NewStackInput(
     val stack = Stack(name, size)
 
     fun onNewStackAndResetState() {
-        onNewStack(stack)
+        onNewStack(stack.trimmedName())
         name = defaultName
         size = defaultSize
     }
 
-    Text("New stack 👉")
+    H3 {
+        Text("🆕 New stack 👇")
+    }
     Span {
         StackInput(
             stack = stack,
@@ -361,10 +446,11 @@ private fun NewStackInput(
                     onNewStackAndResetState()
                 }
             },
+            onEditingChange = onEditingChange,
         )
     }
     Span {
-        Button(attrs = {
+        Button({
             if (stack.validate()) onClick {
                 onNewStackAndResetState()
             } else {
@@ -381,6 +467,7 @@ private fun StackInput(
     stack: Stack,
     onInput: (stack: Stack) -> Unit,
     onSubmit: () -> Unit,
+    onEditingChange: (isEditing: Boolean) -> Unit,
 ) {
     val submitListener: (SyntheticEvent<EventTarget>) -> Unit = { event ->
         (event.nativeEvent as? KeyboardEvent)?.takeIf { it.key == "Enter" }?.let {
@@ -392,6 +479,8 @@ private fun StackInput(
         placeholder("enter a name")
         onInput { onInput(stack.copy(name = it.value)) }
         onKeyUp(submitListener)
+        onFocus { onEditingChange(true) }
+        onBlur { onEditingChange(false) }
     }
     Span {
         val minSize = 0
@@ -404,6 +493,8 @@ private fun StackInput(
                     ?.let { newSize -> onInput(stack.copy(size = newSize)) }
             }
             onKeyUp(submitListener)
+            onFocus { onEditingChange(true) }
+            onBlur { onEditingChange(false) }
         }
     }
 }
@@ -413,12 +504,18 @@ private fun EditableStack(
     stack: Stack,
     onEdit: () -> Unit,
 ) {
-    Button({ onClick { onEdit() } }) {
-        Text("✏️")
-    }
-    Span {
-        Stack(stack)
-    }
+    Row(
+        {
+            Button({ onClick { onEdit() } }) {
+                Text("✏️")
+            }
+        },
+        {
+            Span {
+                Stack(stack)
+            }
+        },
+    )
 }
 
 @Composable
@@ -426,42 +523,54 @@ private fun Stack(stack: Stack) {
     Text("${stack.name}: ${stack.size}")
 }
 
+private fun Stack.trimmedName() = copy(name = this.name.trim())
+
 @Composable
 private fun StackEditor(
     currentStack: Stack,
     isValidName: String.() -> Boolean,
     onSave: (savedStack: Stack) -> Unit,
     onDelete: () -> Unit,
+    onEditingChange: (isEditing: Boolean) -> Unit,
 ) {
     var stack by remember { mutableStateOf(currentStack) }
-
     fun Stack.validate() = isValid && name.isValidName()
-    fun Stack.trimmedName() = stack.copy(name = this.name.trim())
-
-    Button({
-        if (stack.validate()) onClick {
-            onSave(stack.trimmedName())
-        } else {
-            disabled()
-        }
-    }) {
-        Text("💾")
-    }
-    Span {
-        Button({ onClick { onDelete() } }) {
-            Text("🗑")
-        }
-    }
-    StackInput(
-        stack = stack,
-        onInput = { stack = it },
-        onSubmit = { stack.takeIf { it.validate() }?.run(Stack::trimmedName)?.let(onSave) },
+    Row(
+        {
+            Button({
+                if (stack.validate()) onClick {
+                    onSave(stack.trimmedName())
+                } else {
+                    disabled()
+                }
+            }) {
+                Text("💾")
+            }
+        },
+        {
+            Button({ onClick { onDelete() } }) {
+                Text("🗑")
+            }
+        },
+        {
+            StackInput(
+                stack = stack,
+                onInput = { stack = it },
+                onSubmit = {
+                    stack.takeIf { it.validate() }?.run(Stack::trimmedName)?.let(onSave)
+                },
+                onEditingChange = onEditingChange
+            )
+        },
     )
 }
 
 @Composable
-fun ResetButton(onReset: () -> Unit) {
-    Button(attrs = {
+fun Reset(onReset: () -> Unit) {
+    H3 {
+        Text("🔁 Reset app")
+    }
+    Button({
         style {
             onClick {
                 if (window.confirm(
@@ -474,6 +583,8 @@ fun ResetButton(onReset: () -> Unit) {
             }
         }
     }) {
-        Text("🆕 Reset")
+        H3 {
+            Text("RESET")
+        }
     }
 }
