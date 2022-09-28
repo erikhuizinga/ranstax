@@ -4,7 +4,7 @@ plugins {
     val kotlinVersion = "1.6.10"
     kotlin("multiplatform") version kotlinVersion
     kotlin("plugin.serialization") version kotlinVersion
-    id("org.jetbrains.compose") version "1.1.0"
+    id("org.jetbrains.compose") version "1.1.1"
 }
 
 group = "me.user"
