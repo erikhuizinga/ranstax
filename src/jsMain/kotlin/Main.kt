@@ -24,6 +24,7 @@ import org.jetbrains.compose.web.css.AlignItems
 import org.jetbrains.compose.web.css.Color
 import org.jetbrains.compose.web.css.DisplayStyle
 import org.jetbrains.compose.web.css.FlexDirection
+import org.jetbrains.compose.web.css.FlexWrap
 import org.jetbrains.compose.web.css.LineStyle
 import org.jetbrains.compose.web.css.Style
 import org.jetbrains.compose.web.css.StyleSheet
@@ -33,7 +34,7 @@ import org.jetbrains.compose.web.css.borderRadius
 import org.jetbrains.compose.web.css.boxSizing
 import org.jetbrains.compose.web.css.display
 import org.jetbrains.compose.web.css.em
-import org.jetbrains.compose.web.css.flexDirection
+import org.jetbrains.compose.web.css.flexFlow
 import org.jetbrains.compose.web.css.fontFamily
 import org.jetbrains.compose.web.css.height
 import org.jetbrains.compose.web.css.margin
@@ -120,19 +121,19 @@ object RanstaxStyle : StyleSheet() {
 
     val layout by style {
         display(DisplayStyle.Flex)
-        flexDirection(FlexDirection.Column)
+        flexFlow(FlexDirection.Column, FlexWrap.Wrap)
         alignItems(AlignItems.Center)
         margin(0.px)
         height(100.percent)
     }
     val column by style {
         display(DisplayStyle.Flex)
-        flexDirection(FlexDirection.Column)
+        flexFlow(FlexDirection.Column, FlexWrap.Wrap)
         alignItems(AlignItems.Normal)
     }
     val row by style {
         display(DisplayStyle.Flex)
-        flexDirection(FlexDirection.Row)
+        flexFlow(FlexDirection.Row, FlexWrap.Wrap)
         alignItems(AlignItems.Normal)
     }
     val columnContainer by style {
