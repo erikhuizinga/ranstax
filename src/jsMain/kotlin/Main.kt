@@ -434,7 +434,7 @@ private fun NewStackInput(
     }
 
     H3 {
-        Text("🆕 New stack 👇")
+        Text("🆕 New stack")
     }
     Span {
         StackInput(
