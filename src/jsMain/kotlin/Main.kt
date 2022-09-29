@@ -39,6 +39,7 @@ import org.jetbrains.compose.web.css.fontFamily
 import org.jetbrains.compose.web.css.height
 import org.jetbrains.compose.web.css.margin
 import org.jetbrains.compose.web.css.maxHeight
+import org.jetbrains.compose.web.css.overflowX
 import org.jetbrains.compose.web.css.overflowY
 import org.jetbrains.compose.web.css.padding
 import org.jetbrains.compose.web.css.paddingBottom
@@ -181,7 +182,7 @@ fun RanstaxHeader() {
     Div({
         style {
             fontFamily("monospace")
-            whiteSpace("break-spaces")
+            whiteSpace("pre")
             margin(16.px)
         }
     }) {
