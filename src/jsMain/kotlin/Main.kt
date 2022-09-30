@@ -351,12 +351,10 @@ private fun DrawButton(
     Row(
         {
             Button({
-                style {
-                    if (ranstaxState.isDrawButtonEnabled) onClick {
-                        onDraw()
-                    } else {
-                        disabled()
-                    }
+                if (ranstaxState.isDrawButtonEnabled) onClick {
+                    onDraw()
+                } else {
+                    disabled()
                 }
             }
             ) {
@@ -388,7 +386,7 @@ private fun History(ranstaxState: RanstaxState) {
             Text("📜 History")
         }
 
-        Div({ style { classes(RanstaxStyle.history) } }) {
+        Div({ classes(RanstaxStyle.history) }) {
             DisposableEffect(lastDrawnStackNames.size) {
                 fun scrollToEnd() {
                     scopeElement.apply { scrollTop = scrollHeight.toDouble() }
@@ -640,15 +638,13 @@ fun Reset(onReset: () -> Unit) {
         Text("🔁 Reset app")
     }
     Button({
-        style {
-            onClick {
-                if (window.confirm(
-                        "Do you really want to reset all data?" +
-                                " If you choose to reset, you will lose all current data."
-                    )
-                ) {
-                    onReset()
-                }
+        onClick {
+            if (window.confirm(
+                    "Do you really want to reset all data?" +
+                            " If you choose to reset, you will lose all current data."
+                )
+            ) {
+                onReset()
             }
         }
     }) {
