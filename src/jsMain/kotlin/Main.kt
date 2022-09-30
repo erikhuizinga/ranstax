@@ -108,6 +108,9 @@ private fun loadRanstaxState(): RanstaxState =
     localStorage[RANSTAX_STATE_KEY]?.let(Json.Default::decodeFromString) ?: RanstaxState()
 
 object RanstaxStyle : StyleSheet() {
+    private val smallPadding = 2.px
+    private val mediumPadding = 8.px
+
     init {
         universal style {
             boxSizing("border-box")
@@ -136,16 +139,16 @@ object RanstaxStyle : StyleSheet() {
         alignItems(AlignItems.Normal)
     }
     val columnHeader by style {
-        paddingBottom(2.px)
+        paddingBottom(smallPadding)
     }
     val columnFooter by style {
-        paddingTop(2.px)
+        paddingTop(smallPadding)
     }
     val rowHeader by style {
-        paddingRight(2.px)
+        paddingRight(smallPadding)
     }
     val rowFooter by style {
-        paddingLeft(2.px)
+        paddingLeft(smallPadding)
     }
     val history by style {
         fontFamily("monospace")
@@ -153,7 +156,7 @@ object RanstaxStyle : StyleSheet() {
         borderRadius(2.px)
         maxHeight(20.vh)
         overflowY("scroll")
-        padding(8.px)
+        padding(mediumPadding)
     }
 }
 
