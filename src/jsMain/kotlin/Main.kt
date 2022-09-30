@@ -54,7 +54,6 @@ import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.H3
 import org.jetbrains.compose.web.dom.NumberInput
 import org.jetbrains.compose.web.dom.Small
-import org.jetbrains.compose.web.dom.Span
 import org.jetbrains.compose.web.dom.Text
 import org.jetbrains.compose.web.dom.TextInput
 import org.jetbrains.compose.web.renderComposable
@@ -136,13 +135,17 @@ object RanstaxStyle : StyleSheet() {
         flexFlow(FlexDirection.Row, FlexWrap.Wrap)
         alignItems(AlignItems.Normal)
     }
-    val columnContainer by style {
-        paddingTop(2.px)
+    val columnHeader by style {
         paddingBottom(2.px)
     }
-    val rowContainer by style {
-        paddingLeft(2.px)
+    val columnFooter by style {
+        paddingTop(2.px)
+    }
+    val rowHeader by style {
         paddingRight(2.px)
+    }
+    val rowFooter by style {
+        paddingLeft(2.px)
     }
     val history by style {
         fontFamily("monospace")
@@ -162,18 +165,45 @@ fun Layout(vararg composables: @Composable () -> Unit) {
 }
 
 @Composable
-fun ColumnContainer(child: @Composable () -> Unit) {
-    Container({ style { classes(RanstaxStyle.columnContainer) } }, child)
+fun ColumnHeader(child: @Composable () -> Unit) {
+    Div({ classes(RanstaxStyle.columnHeader) }) {
+        child()
+    }
 }
 
 @Composable
-fun RowContainer(child: @Composable () -> Unit) {
-    Container({ style { classes(RanstaxStyle.rowContainer) } }, child)
+fun ColumnElement(child: @Composable () -> Unit) {
+    Div({ classes(RanstaxStyle.columnHeader, RanstaxStyle.columnFooter) }) {
+        child()
+    }
 }
 
 @Composable
-fun Container(attrs: AttrBuilderContext<HTMLDivElement>? = null, child: @Composable () -> Unit) {
-    Div(attrs) { child() }
+fun ColumnFooter(child: @Composable () -> Unit) {
+    Div({ classes(RanstaxStyle.columnFooter) }) {
+        child()
+    }
+}
+
+@Composable
+fun RowHeader(child: @Composable () -> Unit) {
+    Div({ classes(RanstaxStyle.rowHeader) }) {
+        child()
+    }
+}
+
+@Composable
+fun RowElement(child: @Composable () -> Unit) {
+    Div({ classes(RanstaxStyle.rowHeader, RanstaxStyle.rowFooter) }) {
+        child()
+    }
+}
+
+@Composable
+fun RowFooter(child: @Composable () -> Unit) {
+    Div({ classes(RanstaxStyle.rowFooter) }) {
+        child()
+    }
 }
 
 @Composable
@@ -266,8 +296,34 @@ private fun onDraw(
 
 @Composable
 fun Column(vararg composables: @Composable () -> Unit) {
-    Div({ style { classes(RanstaxStyle.column) } }) {
-        composables.forEach { ColumnContainer(it) }
+    HeaderItemsFooterList(
+        attrs = { classes(RanstaxStyle.column) },
+        Header = { ColumnHeader(it) },
+        Element = { ColumnElement(it) },
+        Footer = { ColumnFooter(it) },
+        composables = composables
+    )
+}
+
+@Composable
+private fun HeaderItemsFooterList(
+    attrs: AttrBuilderContext<HTMLDivElement>,
+    Header: @Composable (@Composable () -> Unit) -> Unit,
+    Element: @Composable (@Composable () -> Unit) -> Unit,
+    Footer: @Composable (@Composable () -> Unit) -> Unit,
+    vararg composables: @Composable () -> Unit,
+) {
+    Div(attrs) {
+        when (composables.size) {
+            0 -> {}
+            1 -> composables[0]()
+            else -> {
+                Header(composables[0])
+                val tail = composables.drop(1)
+                tail.dropLast(1).forEach { Element(it) }
+                Footer(composables.last())
+            }
+        }
     }
 }
 
@@ -278,9 +334,13 @@ fun Column(composables: List<@Composable () -> Unit>) {
 
 @Composable
 fun Row(vararg composables: @Composable () -> Unit) {
-    Div({ style { classes(RanstaxStyle.row) } }) {
-        composables.forEach { RowContainer(it) }
-    }
+    HeaderItemsFooterList(
+        attrs = { classes(RanstaxStyle.row) },
+        Header = { RowHeader(it) },
+        Element = { RowElement(it) },
+        Footer = { RowFooter(it) },
+        composables = composables
+    )
 }
 
 @Composable
@@ -435,32 +495,34 @@ private fun NewStackInput(
     H3 {
         Text("🆕 New stack")
     }
-    Span {
-        StackInput(
-            stack = stack,
-            onInput = { (newName, newSize) ->
-                name = newName
-                size = newSize
-            },
-            onSubmit = {
-                if (stack.validate()) {
+    Row(
+        {
+            StackInput(
+                stack = stack,
+                onInput = { (newName, newSize) ->
+                    name = newName
+                    size = newSize
+                },
+                onSubmit = {
+                    if (stack.validate()) {
+                        onNewStackAndResetState()
+                    }
+                },
+                onEditingChange = onEditingChange,
+            )
+        },
+        {
+            Button({
+                if (stack.validate()) onClick {
                     onNewStackAndResetState()
+                } else {
+                    disabled()
                 }
-            },
-            onEditingChange = onEditingChange,
-        )
-    }
-    Span {
-        Button({
-            if (stack.validate()) onClick {
-                onNewStackAndResetState()
-            } else {
-                disabled()
+            }) {
+                Text("➕")
             }
-        }) {
-            Text("➕")
-        }
-    }
+        },
+    )
 }
 
 @Composable
@@ -476,28 +538,32 @@ private fun StackInput(
             it.preventDefault()
         }
     }
-    TextInput(value = stack.name) {
-        placeholder("enter a name")
-        onInput { onInput(stack.copy(name = it.value)) }
-        onKeyUp(submitListener)
-        onFocus { onEditingChange(true) }
-        onBlur { onEditingChange(false) }
-    }
-    Span {
-        val minSize = 0
-        val maxSize = Int.MAX_VALUE
-        NumberInput(value = stack.size, min = minSize, max = maxSize) {
-            placeholder("size")
-            size(maxSize.toString().length)
-            onInput {
-                it.value?.toInt()?.takeIf { newSize -> newSize in minSize..maxSize }
-                    ?.let { newSize -> onInput(stack.copy(size = newSize)) }
+    Row(
+        {
+            TextInput(value = stack.name) {
+                placeholder("enter a name")
+                onInput { onInput(stack.copy(name = it.value)) }
+                onKeyUp(submitListener)
+                onFocus { onEditingChange(true) }
+                onBlur { onEditingChange(false) }
             }
-            onKeyUp(submitListener)
-            onFocus { onEditingChange(true) }
-            onBlur { onEditingChange(false) }
-        }
-    }
+        },
+        {
+            val minSize = 0
+            val maxSize = Int.MAX_VALUE
+            NumberInput(value = stack.size, min = minSize, max = maxSize) {
+                placeholder("size")
+                size(maxSize.toString().length)
+                onInput {
+                    it.value?.toInt()?.takeIf { newSize -> newSize in minSize..maxSize }
+                        ?.let { newSize -> onInput(stack.copy(size = newSize)) }
+                }
+                onKeyUp(submitListener)
+                onFocus { onEditingChange(true) }
+                onBlur { onEditingChange(false) }
+            }
+        },
+    )
 }
 
 @Composable
@@ -512,9 +578,7 @@ private fun EditableStack(
             }
         },
         {
-            Span {
-                Stack(stack)
-            }
+            Stack(stack)
         },
     )
 }
