@@ -33,7 +33,6 @@ import org.jetbrains.compose.web.css.border
 import org.jetbrains.compose.web.css.borderRadius
 import org.jetbrains.compose.web.css.boxSizing
 import org.jetbrains.compose.web.css.display
-import org.jetbrains.compose.web.css.em
 import org.jetbrains.compose.web.css.flexFlow
 import org.jetbrains.compose.web.css.fontFamily
 import org.jetbrains.compose.web.css.height
@@ -47,6 +46,7 @@ import org.jetbrains.compose.web.css.paddingRight
 import org.jetbrains.compose.web.css.paddingTop
 import org.jetbrains.compose.web.css.percent
 import org.jetbrains.compose.web.css.px
+import org.jetbrains.compose.web.css.vh
 import org.jetbrains.compose.web.css.whiteSpace
 import org.jetbrains.compose.web.dom.AttrBuilderContext
 import org.jetbrains.compose.web.dom.Button
@@ -151,7 +151,7 @@ object RanstaxStyle : StyleSheet() {
         fontFamily("monospace")
         border(1.px, LineStyle.Solid, Color.lightgray)
         borderRadius(2.px)
-        maxHeight(16.em)
+        maxHeight(20.vh)
         overflowY("scroll")
         padding(8.px)
     }
@@ -390,7 +390,11 @@ private fun History(ranstaxState: RanstaxState) {
 
         Div({ style { classes(RanstaxStyle.history) } }) {
             DisposableEffect(lastDrawnStackNames.size) {
-                scopeElement.apply { scrollTop = scrollHeight.toDouble() }
+                fun scrollToEnd() {
+                    scopeElement.apply { scrollTop = scrollHeight.toDouble() }
+                }
+                window.onresize = { scrollToEnd() }
+                scrollToEnd()
                 onDispose {}
             }
 
