@@ -162,7 +162,7 @@ object RanstaxStyle : StyleSheet() {
 
 @Composable
 fun Layout(vararg composables: @Composable () -> Unit) {
-    Div({ style { classes(RanstaxStyle.layout) } }) {
+    Div({ classes(RanstaxStyle.layout) }) {
         Column(*composables)
     }
 }
