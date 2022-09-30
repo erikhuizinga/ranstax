@@ -231,7 +231,9 @@ private data class RanstaxState(
 ) {
     init {
         require(stacks.containsAll(stacksBeingEdited)) {
-            "stacks (${stacks.joinToString()}) must contain all stacksBeingEdited (${stacksBeingEdited.joinToString()}). Stacks not in stacks: " + (stacksBeingEdited - stacks.toSet()).joinToString()
+            "stacks (${stacks.joinToString()}) must contain all " +
+                    "stacksBeingEdited (${stacksBeingEdited.joinToString()})." +
+                    " Stacks not in stacks: " + (stacksBeingEdited - stacks.toSet()).joinToString()
         }
     }
 
@@ -359,8 +361,7 @@ private fun DrawButton(
                 } else {
                     disabled()
                 }
-            }
-            ) {
+            }) {
                 H3 {
                     Text("DRAW")
                 }
@@ -402,8 +403,9 @@ private fun History(ranstaxState: RanstaxState) {
             val indexTemplate = "\$index"
             val nameTemplate = "\$name"
             val indexedNameTemplate = "$indexTemplate: $nameTemplate"
-            val indexLength =
-                ceil(log10((stacks.sumOf { it.size } + lastDrawnStackNames.size + 1).toDouble())).roundToInt()
+            val indexLength = ceil(
+                log10((stacks.sumOf { it.size } + lastDrawnStackNames.size + 1).toDouble())
+            ).roundToInt()
             lastDrawnStackNames.mapIndexed { index, lastDrawnStackName ->
                 val indexString = (index + 1).toString()
                 indexedNameTemplate.replace(
@@ -434,46 +436,45 @@ private fun StackList(
         Text("📚 Stacks")
     }
     val stacksBeingEdited = ranstaxState.stacksBeingEdited
-    Column(
-        stacks.map<Stack, @Composable () -> Unit> { stack ->
-            {
-                if (stack in stacksBeingEdited) {
-                    StackEditor(
-                        currentStack = stack,
-                        isValidName = {
-                            val trimmedName = trim()
-                            stacksBeingEdited.any { it.name == trimmedName } || stacks.none { it.name == trimmedName }
-                        },
-                        onSave = { savedStack ->
-                            onNewRanstaxState(
-                                ranstaxState.copy(
-                                    stacks = stacks.map { if (it == stack) savedStack else it },
-                                    stacksBeingEdited = stacksBeingEdited - stack
-                                )
-                            )
-                        },
-                        onDelete = {
-                            onNewRanstaxState(
-                                ranstaxState.copy(
-                                    stacks = stacks - stack,
-                                    stacksBeingEdited = stacksBeingEdited - stack
-                                )
-                            )
-                        },
-                        onEditingChange = onEditingChange,
-                    )
-                } else {
-                    EditableStack(stack) {
+    Column(stacks.map<Stack, @Composable () -> Unit> { stack ->
+        {
+            if (stack in stacksBeingEdited) {
+                StackEditor(
+                    currentStack = stack,
+                    isValidName = {
+                        val trimmedName = trim()
+                        stacksBeingEdited.any { it.name == trimmedName } ||
+                                stacks.none { it.name == trimmedName }
+                    },
+                    onSave = { savedStack ->
                         onNewRanstaxState(
                             ranstaxState.copy(
-                                stacksBeingEdited = stacksBeingEdited + stack
+                                stacks = stacks.map { if (it == stack) savedStack else it },
+                                stacksBeingEdited = stacksBeingEdited - stack
                             )
                         )
-                    }
+                    },
+                    onDelete = {
+                        onNewRanstaxState(
+                            ranstaxState.copy(
+                                stacks = stacks - stack,
+                                stacksBeingEdited = stacksBeingEdited - stack
+                            )
+                        )
+                    },
+                    onEditingChange = onEditingChange,
+                )
+            } else {
+                EditableStack(stack) {
+                    onNewRanstaxState(
+                        ranstaxState.copy(
+                            stacksBeingEdited = stacksBeingEdited + stack
+                        )
+                    )
                 }
             }
         }
-    )
+    })
 }
 
 @Composable
@@ -626,9 +627,7 @@ private fun StackEditor(
             StackInput(
                 stack = stack,
                 onInput = { stack = it },
-                onSubmit = {
-                    stack.takeIf { it.validate() }?.run(Stack::trimmedName)?.let(onSave)
-                },
+                onSubmit = { stack.takeIf { it.validate() }?.run(Stack::trimmedName)?.let(onSave) },
                 onEditingChange = onEditingChange
             )
         },
