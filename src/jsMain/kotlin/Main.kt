@@ -226,7 +226,7 @@ fun RanstaxHeader() {
 private data class RanstaxState(
     val stacks: List<Stack> = emptyList(),
     val stacksBeingEdited: List<Stack> = emptyList(),
-    val lastDrawnStackNames: List<String> = emptyList(),
+    val drawnStackNames: List<List<String>> = emptyList(),
     val isEditing: Boolean = false,
 ) {
     init {
@@ -278,6 +278,7 @@ private fun onDraw(
 ) {
     var newRanstaxState = ranstaxState
     val theNumToDraw = min(numToDraw, ranstaxState.stacks.sumOf { it.size })
+    val drawnStackNames = mutableListOf<String>()
     repeat(theNumToDraw) {
         val stacks = newRanstaxState.stacks
         var chosenIndex = Random.nextInt(stacks.sumOf { it.size })
@@ -293,9 +294,12 @@ private fun onDraw(
                     it
                 }
             },
-            lastDrawnStackNames = newRanstaxState.lastDrawnStackNames + chosenStack.name,
         )
+        drawnStackNames += chosenStack.name
     }
+    newRanstaxState = newRanstaxState.copy(
+        drawnStackNames = newRanstaxState.drawnStackNames + listOf(drawnStackNames)
+    )
     onNewRanstaxState(newRanstaxState)
 }
 
@@ -376,10 +380,9 @@ private fun DrawButton(
 }
 
 @Composable
-//TODO Add user action to history
 private fun History(ranstaxState: RanstaxState) {
-    val (stacks, _, lastDrawnStackNames) = ranstaxState
-    if (lastDrawnStackNames.isEmpty()) {
+    val (stacks, _, drawnStackNames) = ranstaxState
+    if (drawnStackNames.isEmpty()) {
         if (ranstaxState.isDrawButtonEnabled) {
             Text(
                 "👆 Draw to start history"
@@ -391,7 +394,7 @@ private fun History(ranstaxState: RanstaxState) {
         }
 
         Div({ classes(RanstaxStyle.history) }) {
-            DisposableEffect(lastDrawnStackNames.size) {
+            DisposableEffect(drawnStackNames.size) {
                 fun scrollToEnd() {
                     scopeElement.apply { scrollTop = scrollHeight.toDouble() }
                 }
@@ -403,18 +406,24 @@ private fun History(ranstaxState: RanstaxState) {
             val indexTemplate = "\$index"
             val nameTemplate = "\$name"
             val indexedNameTemplate = "$indexTemplate: $nameTemplate"
-            val indexLength = ceil(
-                log10((stacks.sumOf { it.size } + lastDrawnStackNames.size + 1).toDouble())
-            ).roundToInt()
-            lastDrawnStackNames.mapIndexed { index, lastDrawnStackName ->
-                val indexString = (index + 1).toString()
-                indexedNameTemplate.replace(
-                    indexTemplate,
-                    "0".repeat(indexLength - indexString.length) + indexString
-                ).replace(nameTemplate, lastDrawnStackName)
-            }.forEach {
+            val indexLength = ceil(log10(
+                (stacks.sumOf { it.size } + drawnStackNames.sumOf { it.size } + 1).toDouble()
+            )).roundToInt()
+            var index = 0
+            drawnStackNames.forEach { drawActionStackNames ->
                 Div {
-                    Text(it)
+                    Text("Drew ${drawActionStackNames.size} 👇")
+                }
+                drawActionStackNames.map { stackName ->
+                    val indexString = (++index).toString()
+                    indexedNameTemplate.replace(
+                        indexTemplate,
+                        "0".repeat(indexLength - indexString.length) + indexString
+                    ).replace(nameTemplate, stackName)
+                }.forEach {
+                    Div {
+                        Text(it)
+                    }
                 }
             }
         }
