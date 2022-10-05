@@ -245,7 +245,7 @@ private fun RanstaxApp(ranstaxState: RanstaxState, onNewRanstaxState: (RanstaxSt
     val stacks = ranstaxState.stacks
 
     document.onkeyup = { event ->
-        if (!ranstaxState.isEditing && ranstaxState.isDrawButtonEnabled && event.key in "0".."9") {
+        if (!ranstaxState.isEditing && ranstaxState.isDrawButtonEnabled && event.key in "1".."9") {
             onDraw(event.key.toInt(), ranstaxState, onNewRanstaxState)
             event.preventDefault()
         }
