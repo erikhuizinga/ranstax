@@ -237,7 +237,10 @@ private data class RanstaxState(
         }
     }
 
-    val isDrawButtonEnabled = stacks.sumOf { it.size } > 0 && stacksBeingEdited.isEmpty()
+    val hasStacks = stacks.isNotEmpty()
+    val totalStackSize = stacks.sumOf { it.size }
+    val areAllStacksEmpty = totalStackSize == 0
+    val isDrawButtonEnabled = !areAllStacksEmpty && stacksBeingEdited.isEmpty()
 }
 
 @Composable
@@ -277,11 +280,11 @@ private fun onDraw(
     onNewRanstaxState: (RanstaxState) -> Unit,
 ) {
     var newRanstaxState = ranstaxState
-    val theNumToDraw = min(numToDraw, ranstaxState.stacks.sumOf { it.size })
+    val theNumToDraw = min(numToDraw, ranstaxState.totalStackSize)
     val drawnStackNames = mutableListOf<String>()
     repeat(theNumToDraw) {
+        var chosenIndex = Random.nextInt(newRanstaxState.totalStackSize)
         val stacks = newRanstaxState.stacks
-        var chosenIndex = Random.nextInt(stacks.sumOf { it.size })
         val chosenStack = stacks.first {
             chosenIndex -= it.size
             chosenIndex < 0
@@ -357,23 +360,34 @@ private fun DrawButton(
     ranstaxState: RanstaxState,
     onDraw: () -> Unit,
 ) {
-    Row(
+    Column(
         {
-            Button({
-                if (ranstaxState.isDrawButtonEnabled) onClick {
-                    onDraw()
-                } else {
-                    disabled()
-                }
-            }) {
-                H3 {
-                    Text("DRAW")
-                }
-            }
+            Row(
+                {
+                    Button({
+                        if (ranstaxState.isDrawButtonEnabled) onClick {
+                            onDraw()
+                        } else {
+                            disabled()
+                        }
+                    }) {
+                        H3 {
+                            Text("DRAW")
+                        }
+                    }
+                },
+                {
+                    Small {
+                        Text("ℹ️ press any number key to draw that many items")
+                    }
+                },
+            )
         },
         {
-            Small {
-                Text("ℹ️ press any number key to draw that many items")
+            if (ranstaxState.hasStacks && ranstaxState.areAllStacksEmpty) {
+                Div {
+                    Text("🫥 Nothing left to draw, stacks are empty")
+                }
             }
         },
     )
@@ -407,7 +421,7 @@ private fun History(ranstaxState: RanstaxState) {
             val nameTemplate = "\$name"
             val indexedNameTemplate = "$indexTemplate: $nameTemplate"
             val indexLength = ceil(log10(
-                (stacks.sumOf { it.size } + drawnStackNames.sumOf { it.size } + 1).toDouble()
+                (ranstaxState.totalStackSize + drawnStackNames.sumOf { it.size } + 1).toDouble()
             )).roundToInt()
             var index = 0
             drawnStackNames.forEach { drawActionStackNames ->
