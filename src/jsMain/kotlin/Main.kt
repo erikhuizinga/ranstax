@@ -92,7 +92,8 @@ private fun setupDebugStacks() {
         val northAmericaStack = Stack("North America", 180)
         val europeStack = Stack("Europe", 81)
         val oceaniaStack = Stack("Oceania", 95)
-        val stacks = listOf(northAmericaStack, europeStack, oceaniaStack)
+        val asiaStack = Stack("Asia", 90)
+        val stacks = listOf(northAmericaStack, europeStack, oceaniaStack, asiaStack)
         val stacksBeingEdited: List<Stack> = listOf(/* northAmericaStack */)
         storeRanstaxState(RanstaxState(stacks, stacksBeingEdited))
     }
