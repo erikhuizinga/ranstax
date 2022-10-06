@@ -38,6 +38,7 @@ import org.jetbrains.compose.web.css.fontFamily
 import org.jetbrains.compose.web.css.height
 import org.jetbrains.compose.web.css.margin
 import org.jetbrains.compose.web.css.maxHeight
+import org.jetbrains.compose.web.css.opacity
 import org.jetbrains.compose.web.css.overflowY
 import org.jetbrains.compose.web.css.padding
 import org.jetbrains.compose.web.css.paddingBottom
@@ -396,9 +397,15 @@ private fun DrawButton(
 
 @Composable
 private fun History(ranstaxState: RanstaxState) {
-    val (stacks, _, drawnStackNames) = ranstaxState
+    val drawnStackNames = ranstaxState.drawnStackNames
     if (drawnStackNames.isEmpty()) {
-        if (ranstaxState.isDrawButtonEnabled) {
+        Div({
+            style {
+                if (!ranstaxState.isDrawButtonEnabled) {
+                    opacity(0.3)
+                }
+            }
+        }) {
             Text(
                 "👆 Draw to start history"
             )
