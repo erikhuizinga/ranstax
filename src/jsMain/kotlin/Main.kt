@@ -20,35 +20,7 @@ import kotlinx.serialization.json.Json
 import org.jetbrains.compose.web.attributes.disabled
 import org.jetbrains.compose.web.attributes.placeholder
 import org.jetbrains.compose.web.attributes.size
-import org.jetbrains.compose.web.css.AlignItems
-import org.jetbrains.compose.web.css.Color
-import org.jetbrains.compose.web.css.DisplayStyle
-import org.jetbrains.compose.web.css.FlexDirection
-import org.jetbrains.compose.web.css.FlexWrap
-import org.jetbrains.compose.web.css.LineStyle
 import org.jetbrains.compose.web.css.Style
-import org.jetbrains.compose.web.css.StyleSheet
-import org.jetbrains.compose.web.css.alignItems
-import org.jetbrains.compose.web.css.border
-import org.jetbrains.compose.web.css.borderRadius
-import org.jetbrains.compose.web.css.boxSizing
-import org.jetbrains.compose.web.css.display
-import org.jetbrains.compose.web.css.flexFlow
-import org.jetbrains.compose.web.css.fontFamily
-import org.jetbrains.compose.web.css.height
-import org.jetbrains.compose.web.css.margin
-import org.jetbrains.compose.web.css.maxHeight
-import org.jetbrains.compose.web.css.opacity
-import org.jetbrains.compose.web.css.overflowY
-import org.jetbrains.compose.web.css.padding
-import org.jetbrains.compose.web.css.paddingBottom
-import org.jetbrains.compose.web.css.paddingLeft
-import org.jetbrains.compose.web.css.paddingRight
-import org.jetbrains.compose.web.css.paddingTop
-import org.jetbrains.compose.web.css.percent
-import org.jetbrains.compose.web.css.px
-import org.jetbrains.compose.web.css.vh
-import org.jetbrains.compose.web.css.whiteSpace
 import org.jetbrains.compose.web.dom.AttrBuilderContext
 import org.jetbrains.compose.web.dom.Button
 import org.jetbrains.compose.web.dom.Div
@@ -109,59 +81,6 @@ private fun storeRanstaxState(ranstaxState: RanstaxState) {
 private fun loadRanstaxState(): RanstaxState =
     localStorage[RANSTAX_STATE_KEY]?.let(Json.Default::decodeFromString) ?: RanstaxState()
 
-object RanstaxStyle : StyleSheet() {
-    private val smallPadding = 2.px
-    private val mediumPadding = 8.px
-
-    init {
-        universal style {
-            boxSizing("border-box")
-            margin(0.px)
-        }
-        "html, body" style {
-            height(100.percent)
-        }
-    }
-
-    val layout by style {
-        display(DisplayStyle.Flex)
-        flexFlow(FlexDirection.Column, FlexWrap.Wrap)
-        alignItems(AlignItems.Center)
-        margin(0.px)
-        height(100.percent)
-    }
-    val column by style {
-        display(DisplayStyle.Flex)
-        flexFlow(FlexDirection.Column, FlexWrap.Wrap)
-        alignItems(AlignItems.Normal)
-    }
-    val row by style {
-        display(DisplayStyle.Flex)
-        flexFlow(FlexDirection.Row, FlexWrap.Wrap)
-        alignItems(AlignItems.Normal)
-    }
-    val columnHeader by style {
-        paddingBottom(smallPadding)
-    }
-    val columnFooter by style {
-        paddingTop(smallPadding)
-    }
-    val rowHeader by style {
-        paddingRight(smallPadding)
-    }
-    val rowFooter by style {
-        paddingLeft(smallPadding)
-    }
-    val history by style {
-        fontFamily("monospace")
-        border(1.px, LineStyle.Solid, Color.lightgray)
-        borderRadius(2.px)
-        maxHeight(20.vh)
-        overflowY("scroll")
-        padding(mediumPadding)
-    }
-}
-
 @Composable
 fun Layout(vararg composables: @Composable () -> Unit) {
     Div({ classes(RanstaxStyle.layout) }) {
@@ -213,13 +132,7 @@ fun RowFooter(child: @Composable () -> Unit) {
 
 @Composable
 fun RanstaxHeader() {
-    Div({
-        style {
-            fontFamily("monospace")
-            whiteSpace("pre")
-            margin(16.px)
-        }
-    }) {
+    Div({ classes(RanstaxStyle.header) }) {
         Text(ranstaxHeaders.random())
     }
 }
@@ -233,9 +146,7 @@ private data class RanstaxState(
 ) {
     init {
         require(stacks.containsAll(stacksBeingEdited)) {
-            "stacks (${stacks.joinToString()}) must contain all " +
-                    "stacksBeingEdited (${stacksBeingEdited.joinToString()})." +
-                    " Stacks not in stacks: " + (stacksBeingEdited - stacks.toSet()).joinToString()
+            "stacks (${stacks.joinToString()}) must contain all " + "stacksBeingEdited (${stacksBeingEdited.joinToString()})." + " Stacks not in stacks: " + (stacksBeingEdited - stacks.toSet()).joinToString()
         }
     }
 
@@ -259,21 +170,23 @@ private fun RanstaxApp(ranstaxState: RanstaxState, onNewRanstaxState: (RanstaxSt
     val onEditingChange = { isEditing: Boolean ->
         onNewRanstaxState(ranstaxState.copy(isEditing = isEditing))
     }
-    Column(
-        { DrawButton(ranstaxState) { onDraw(1, ranstaxState, onNewRanstaxState) } },
-        { History(ranstaxState) },
-        { StackList(ranstaxState, onNewRanstaxState, onEditingChange) },
-        {
-            NewStackInput(
-                isValidName = { stacks.none { it.name == trim() } },
-                onNewStack = {
-                    onNewRanstaxState(ranstaxState.copy(stacks = stacks + it))
-                },
-                onEditingChange = onEditingChange,
-            )
-        },
-        { Reset { onNewRanstaxState(RanstaxState()) } },
-    )
+    Div({ classes(RanstaxStyle.app) }) {
+        Column(
+            { DrawButton(ranstaxState) { onDraw(1, ranstaxState, onNewRanstaxState) } },
+            { History(ranstaxState) },
+            { StackList(ranstaxState, onNewRanstaxState, onEditingChange) },
+            {
+                NewStackInput(
+                    isValidName = { stacks.none { it.name == trim() } },
+                    onNewStack = {
+                        onNewRanstaxState(ranstaxState.copy(stacks = stacks + it))
+                    },
+                    onEditingChange = onEditingChange,
+                )
+            },
+            { Reset { onNewRanstaxState(RanstaxState()) } },
+        )
+    }
 }
 
 private fun onDraw(
@@ -373,13 +286,15 @@ private fun DrawButton(
                             disabled()
                         }
                     }) {
-                        H3 {
-                            Text("DRAW")
-                        }
+                        Text("draw")
                     }
                 },
                 {
-                    Small {
+                    Small({
+                        if (!ranstaxState.isDrawButtonEnabled) {
+                            classes(RanstaxStyle.disabledStyle)
+                        }
+                    }) {
                         Text("ℹ️ press any number key to draw that many items")
                     }
                 },
@@ -400,10 +315,8 @@ private fun History(ranstaxState: RanstaxState) {
     val drawnStackNames = ranstaxState.drawnStackNames
     if (drawnStackNames.isEmpty()) {
         Div({
-            style {
-                if (!ranstaxState.isDrawButtonEnabled) {
-                    opacity(0.3)
-                }
+            if (!ranstaxState.isDrawButtonEnabled) {
+                classes(RanstaxStyle.disabledStyle)
             }
         }) {
             Text(
@@ -415,7 +328,13 @@ private fun History(ranstaxState: RanstaxState) {
             Text("📜 History")
         }
 
-        Div({ classes(RanstaxStyle.history) }) {
+        Div({
+            classes(
+                RanstaxStyle.history,
+                RanstaxStyle.borderRadius,
+                RanstaxStyle.visibleBorder
+            )
+        }) {
             DisposableEffect(drawnStackNames.size) {
                 fun scrollToEnd() {
                     scopeElement.apply { scrollTop = scrollHeight.toDouble() }
@@ -428,9 +347,8 @@ private fun History(ranstaxState: RanstaxState) {
             val indexTemplate = "\$index"
             val nameTemplate = "\$name"
             val indexedNameTemplate = "$indexTemplate: $nameTemplate"
-            val indexLength = ceil(log10(
-                (ranstaxState.totalStackSize + drawnStackNames.sumOf { it.size } + 1).toDouble()
-            )).roundToInt()
+            val indexLength =
+                ceil(log10((ranstaxState.totalStackSize + drawnStackNames.sumOf { it.size } + 1).toDouble())).roundToInt()
             var index = 0
             drawnStackNames.forEach { drawActionStackNames ->
                 Div {
@@ -439,8 +357,7 @@ private fun History(ranstaxState: RanstaxState) {
                 drawActionStackNames.map { stackName ->
                     val indexString = (++index).toString()
                     indexedNameTemplate.replace(
-                        indexTemplate,
-                        "0".repeat(indexLength - indexString.length) + indexString
+                        indexTemplate, "0".repeat(indexLength - indexString.length) + indexString
                     ).replace(nameTemplate, stackName)
                 }.forEach {
                     Div {
@@ -474,8 +391,7 @@ private fun StackList(
                     currentStack = stack,
                     isValidName = {
                         val trimmedName = trim()
-                        stacksBeingEdited.any { it.name == trimmedName } ||
-                                stacks.none { it.name == trimmedName }
+                        stacksBeingEdited.any { it.name == trimmedName } || stacks.none { it.name == trimmedName }
                     },
                     onSave = { savedStack ->
                         onNewRanstaxState(
@@ -673,16 +589,13 @@ fun Reset(onReset: () -> Unit) {
     Button({
         onClick {
             if (window.confirm(
-                    "Do you really want to reset all data?" +
-                            " If you choose to reset, you will lose all current data."
+                    "Do you really want to reset all data?" + " If you choose to reset, you will lose all current data."
                 )
             ) {
                 onReset()
             }
         }
     }) {
-        H3 {
-            Text("RESET")
-        }
+        Text("reset")
     }
 }
