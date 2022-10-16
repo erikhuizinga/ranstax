@@ -22,7 +22,6 @@ import org.jetbrains.compose.web.css.margin
 import org.jetbrains.compose.web.css.maxHeight
 import org.jetbrains.compose.web.css.minWidth
 import org.jetbrains.compose.web.css.minus
-import org.jetbrains.compose.web.css.opacity
 import org.jetbrains.compose.web.css.overflowY
 import org.jetbrains.compose.web.css.padding
 import org.jetbrains.compose.web.css.paddingBottom
@@ -58,11 +57,6 @@ object RanstaxStyle : StyleSheet() {
     //endregion
 
     private val boxShadow = "$shadow 0px 2px 4px 0px"
-    private const val disabledOpacity = 0.3
-
-    val disabledStyle by style {
-        opacity(disabledOpacity)
-    }
 
     init {
         universal style {
@@ -80,9 +74,6 @@ object RanstaxStyle : StyleSheet() {
             fontWeight(600)
             border(style = LineStyle.None)
             property("box-shadow", boxShadow)
-        }
-        type("button") + attr("disabled") style {
-            className(disabledStyle)
         }
         "input" style {
             backgroundColor(cream)

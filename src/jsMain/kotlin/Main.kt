@@ -26,7 +26,6 @@ import org.jetbrains.compose.web.dom.Button
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.H3
 import org.jetbrains.compose.web.dom.NumberInput
-import org.jetbrains.compose.web.dom.Small
 import org.jetbrains.compose.web.dom.Text
 import org.jetbrains.compose.web.dom.TextInput
 import org.jetbrains.compose.web.renderComposable
@@ -277,34 +276,23 @@ private fun DrawButton(
 ) {
     Column(
         {
-            Row(
-                {
-                    Button({
-                        if (ranstaxState.isDrawButtonEnabled) onClick {
-                            onDraw()
-                        } else {
-                            disabled()
-                        }
-                    }) {
-                        Text("draw")
-                    }
-                },
-                {
-                    Small({
-                        if (!ranstaxState.isDrawButtonEnabled) {
-                            classes(RanstaxStyle.disabledStyle)
-                        }
-                    }) {
-                        Text("ℹ️ press any number key to draw that many items")
-                    }
-                },
-            )
+            Button({
+                if (ranstaxState.isDrawButtonEnabled) onClick {
+                    onDraw()
+                } else {
+                    disabled()
+                }
+            }) {
+                Text("draw")
+            }
         },
         {
             if (ranstaxState.hasStacks && ranstaxState.areAllStacksEmpty) {
-                Div {
-                    Text("🫥 Nothing left to draw, stacks are empty")
-                }
+                Text("🫥 Nothing left to draw, stacks are empty")
+            } else if (ranstaxState.stacksBeingEdited.isNotEmpty()) {
+                Text("⚠️ Finish editing all stacks to enable the draw button")
+            } else if (ranstaxState.isDrawButtonEnabled) {
+                Text("ℹ️ Press any number key to draw that many items")
             }
         },
     )
@@ -314,15 +302,7 @@ private fun DrawButton(
 private fun History(ranstaxState: RanstaxState) {
     val drawnStackNames = ranstaxState.drawnStackNames
     if (drawnStackNames.isEmpty()) {
-        Div({
-            if (!ranstaxState.isDrawButtonEnabled) {
-                classes(RanstaxStyle.disabledStyle)
-            }
-        }) {
-            Text(
-                "👆 Draw to start history"
-            )
-        }
+        Text("👆 Draw to start history")
     } else {
         H3 {
             Text("📜 History")
@@ -332,7 +312,7 @@ private fun History(ranstaxState: RanstaxState) {
             classes(
                 RanstaxStyle.history,
                 RanstaxStyle.borderRadius,
-                RanstaxStyle.visibleBorder
+                RanstaxStyle.visibleBorder,
             )
         }) {
             DisposableEffect(drawnStackNames.size) {
