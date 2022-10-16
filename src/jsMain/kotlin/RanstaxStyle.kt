@@ -19,6 +19,7 @@ import org.jetbrains.compose.web.css.fontSize
 import org.jetbrains.compose.web.css.fontWeight
 import org.jetbrains.compose.web.css.height
 import org.jetbrains.compose.web.css.margin
+import org.jetbrains.compose.web.css.marginBottom
 import org.jetbrains.compose.web.css.maxHeight
 import org.jetbrains.compose.web.css.minWidth
 import org.jetbrains.compose.web.css.minus
@@ -37,6 +38,7 @@ import org.jetbrains.compose.web.css.vw
 import org.jetbrains.compose.web.css.whiteSpace
 import org.jetbrains.compose.web.css.width
 
+
 object RanstaxStyle : StyleSheet() {
     //region Theme colors: https://www.canva.com/colors/color-palettes/random-market-finds/
     private val cream = Color("#F6F4E7")
@@ -50,9 +52,12 @@ object RanstaxStyle : StyleSheet() {
     //endregion
 
     //region Dimensions
+    private val largeMargin = 16.px
+
     private val smallPadding = 2.px
     private val mediumPadding = 8.px
     private val largePadding = 16.px
+
     private val borderRadiusSize = 2.px
     //endregion
 
@@ -116,6 +121,7 @@ object RanstaxStyle : StyleSheet() {
         backgroundColor(kellyGreen)
         padding(largePadding)
         paddingTop(largePadding - 1.em)
+        marginBottom(largeMargin)
         width(100.vw)
         property("box-shadow", boxShadow)
     }
