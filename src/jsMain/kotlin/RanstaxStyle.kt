@@ -1,4 +1,5 @@
 import org.jetbrains.compose.web.css.AlignItems
+import org.jetbrains.compose.web.css.CSSSizeValue
 import org.jetbrains.compose.web.css.Color
 import org.jetbrains.compose.web.css.DisplayStyle
 import org.jetbrains.compose.web.css.FlexDirection
@@ -33,6 +34,8 @@ import org.jetbrains.compose.web.css.percent
 import org.jetbrains.compose.web.css.pt
 import org.jetbrains.compose.web.css.px
 import org.jetbrains.compose.web.css.rgba
+import org.jetbrains.compose.web.css.value
+import org.jetbrains.compose.web.css.variable
 import org.jetbrains.compose.web.css.vh
 import org.jetbrains.compose.web.css.vw
 import org.jetbrains.compose.web.css.whiteSpace
@@ -59,6 +62,8 @@ object RanstaxStyle : StyleSheet() {
     private val largePadding = 16.px
 
     private val borderRadiusSize = 2.px
+
+    private val elementPadding by variable<CSSSizeValue<*>>()
     //endregion
 
     private val boxShadow = "$shadow 0px 2px 4px 0px"
@@ -96,11 +101,20 @@ object RanstaxStyle : StyleSheet() {
         flexFlow(FlexDirection.Column, FlexWrap.Wrap)
         alignItems(AlignItems.Normal)
     }
+    val smallElementPadding by style {
+        elementPadding(smallPadding)
+    }
+    val mediumElementPadding by style {
+        elementPadding(mediumPadding)
+    }
+    val largeElementPadding by style {
+        elementPadding(largePadding)
+    }
     val columnHeader by style {
-        paddingBottom(smallPadding)
+        paddingBottom(elementPadding.value())
     }
     val columnFooter by style {
-        paddingTop(smallPadding)
+        paddingTop(elementPadding.value())
     }
     val row by style {
         display(DisplayStyle.Flex)
@@ -108,10 +122,10 @@ object RanstaxStyle : StyleSheet() {
         alignItems(AlignItems.Normal)
     }
     val rowHeader by style {
-        paddingRight(smallPadding)
+        paddingRight(elementPadding.value())
     }
     val rowFooter by style {
-        paddingLeft(smallPadding)
+        paddingLeft(elementPadding.value())
     }
     val header by style {
         whiteSpace("pre")

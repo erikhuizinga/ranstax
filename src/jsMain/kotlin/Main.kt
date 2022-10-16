@@ -171,6 +171,7 @@ private fun RanstaxApp(ranstaxState: RanstaxState, onNewRanstaxState: (RanstaxSt
     }
     Div({ classes(RanstaxStyle.app) }) {
         Column(
+            attrs = { classes(RanstaxStyle.mediumElementPadding) },
             { DrawButton(ranstaxState) { onDraw(1, ranstaxState, onNewRanstaxState) } },
             { History(ranstaxState) },
             { StackList(ranstaxState, onNewRanstaxState, onEditingChange) },
@@ -221,9 +222,22 @@ private fun onDraw(
 }
 
 @Composable
-fun Column(vararg composables: @Composable () -> Unit) {
+fun Column(
+    vararg composables: @Composable () -> Unit,
+) {
+    Column(null, *composables)
+}
+
+@Composable
+fun Column(
+    attrs: AttrBuilderContext<HTMLDivElement>? = null,
+    vararg composables: @Composable () -> Unit,
+) {
     HeaderItemsFooterList(
-        attrs = { classes(RanstaxStyle.column) },
+        attrs = {
+            classes(RanstaxStyle.column)
+            attrs?.invoke(this)
+        },
         Header = { ColumnHeader(it) },
         Element = { ColumnElement(it) },
         Footer = { ColumnFooter(it) },
@@ -239,7 +253,10 @@ private fun HeaderItemsFooterList(
     Footer: @Composable (@Composable () -> Unit) -> Unit,
     vararg composables: @Composable () -> Unit,
 ) {
-    Div(attrs) {
+    Div({
+        classes(RanstaxStyle.smallElementPadding)
+        attrs()
+    }) {
         when (composables.size) {
             0 -> {}
             1 -> composables[0]()
@@ -275,26 +292,28 @@ private fun DrawButton(
     onDraw: () -> Unit,
 ) {
     Column(
-        {
-            Button({
-                if (ranstaxState.isDrawButtonEnabled) onClick {
-                    onDraw()
-                } else {
-                    disabled()
+        composables = arrayOf(
+            {
+                Button({
+                    if (ranstaxState.isDrawButtonEnabled) onClick {
+                        onDraw()
+                    } else {
+                        disabled()
+                    }
+                }) {
+                    Text("draw")
                 }
-            }) {
-                Text("draw")
-            }
-        },
-        {
-            if (ranstaxState.hasStacks && ranstaxState.areAllStacksEmpty) {
-                Text("🫥 Nothing left to draw, stacks are empty")
-            } else if (ranstaxState.stacksBeingEdited.isNotEmpty()) {
-                Text("⚠️ Finish editing all stacks to enable the draw button")
-            } else if (ranstaxState.isDrawButtonEnabled) {
-                Text("ℹ️ Press any number key to draw that many items")
-            }
-        },
+            },
+            {
+                if (ranstaxState.hasStacks && ranstaxState.areAllStacksEmpty) {
+                    Text("🫥 Nothing left to draw, stacks are empty")
+                } else if (ranstaxState.stacksBeingEdited.isNotEmpty()) {
+                    Text("⚠️ Finish editing all stacks to enable the draw button")
+                } else if (ranstaxState.isDrawButtonEnabled) {
+                    Text("ℹ️ Press any number key to draw that many items")
+                }
+            },
+        )
     )
 }
 
@@ -302,7 +321,9 @@ private fun DrawButton(
 private fun History(ranstaxState: RanstaxState) {
     val drawnStackNames = ranstaxState.drawnStackNames
     if (drawnStackNames.isEmpty()) {
-        Text("👆 Draw to start history")
+        if (ranstaxState.hasStacks) {
+            Text("👆 Draw to start history")
+        }
     } else {
         H3 {
             Text("📜 History")
