@@ -310,7 +310,7 @@ private fun InfoMessage(ranstaxState: RanstaxState) {
                 true -> "🫥 Nothing left to draw, stacks are empty"
                 false -> when (ranstaxState.stacksBeingEdited.isEmpty()) {
                     true -> "ℹ️ Press any number key to draw that many items"
-                    false -> "⚠️ Finish editing all stacks to enable the draw button"
+                    false -> "⚠️ Finish editing all stacks to enable drawing"
                 }
             }
 
