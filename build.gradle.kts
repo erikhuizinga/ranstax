@@ -1,5 +1,3 @@
-import org.jetbrains.compose.compose
-
 plugins {
     val kotlinVersion = "1.7.10"
     kotlin("multiplatform") version kotlinVersion
@@ -7,8 +5,8 @@ plugins {
     id("org.jetbrains.compose") version "1.2.0"
 }
 
-group = "me.user"
-version = "1.0"
+group = "com.github.erikhuizinga"
+version = "1.0.0"
 
 repositories {
     google()
