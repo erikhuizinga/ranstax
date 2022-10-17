@@ -15,6 +15,7 @@ jobs:
       - name: Gradle Wrapper Validation
         uses: gradle/wrapper-validation-action@v1.0.4
   build:
+    needs: gradle_wrapper_validation
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
