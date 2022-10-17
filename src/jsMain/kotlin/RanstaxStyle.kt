@@ -103,8 +103,9 @@ object RanstaxStyle : StyleSheet() {
     val layout by style {
         display(DisplayStyle.Flex)
         flexFlow(FlexDirection.Column, FlexWrap.Wrap)
-        alignItems(AlignItems.Center)
+        alignItems(AlignItems.Normal)
         height(100.percent)
+        boxSizing("border-box")
     }
     val column by style {
         display(DisplayStyle.Flex)

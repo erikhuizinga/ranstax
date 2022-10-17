@@ -47,15 +47,13 @@ fun main() {
     renderComposable(rootElementId = "ranstax") {
         Style(RanstaxStyle)
         var ranstaxState by remember { mutableStateOf(loadRanstaxState()) }
-        Layout(
-            { RanstaxHeader() },
-            {
-                RanstaxApp(ranstaxState) { newRanstaxState ->
-                    storeRanstaxState(newRanstaxState)
-                    ranstaxState = newRanstaxState
-                }
-            },
-        )
+        Layout {
+            RanstaxHeader()
+            RanstaxApp(ranstaxState) { newRanstaxState ->
+                storeRanstaxState(newRanstaxState)
+                ranstaxState = newRanstaxState
+            }
+        }
     }
 }
 
@@ -81,9 +79,9 @@ private fun loadRanstaxState(): RanstaxState =
     localStorage[RANSTAX_STATE_KEY]?.let(Json.Default::decodeFromString) ?: RanstaxState()
 
 @Composable
-fun Layout(vararg composables: @Composable () -> Unit) {
+fun Layout(content: @Composable () -> Unit) {
     Div({ classes(RanstaxStyle.layout) }) {
-        Column(*composables)
+        content()
     }
 }
 
