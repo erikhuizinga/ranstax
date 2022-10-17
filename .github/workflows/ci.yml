@@ -14,7 +14,7 @@ jobs:
         uses: actions/checkout@v3
       - name: Gradle Wrapper Validation
         uses: gradle/wrapper-validation-action@v1
-  build_and_deploy:
+  build:
     needs: gradle_wrapper_validation
     runs-on: ubuntu-latest
     steps:
@@ -29,6 +29,16 @@ jobs:
         uses: actions/upload-pages-artifact@v1
         with:
           path: build/distributions/
+  deploy:
+    needs: build
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
       - name: Deploy GitHub Pages site
-        uses: actions/deploy-pages@v1.2.2
+        uses: actions/deploy-pages@v1
           
