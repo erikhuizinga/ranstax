@@ -65,6 +65,9 @@ object RanstaxStyle : StyleSheet() {
     private val borderRadiusSize = 2.px
 
     private val elementPadding by variable<CSSSizeValue<*>>()
+
+    private val mediumFontSize = 12.pt
+    private val largeFontSize = 20.pt
     //endregion
 
     private val boxShadow = "$shadow 0px 2px 4px 0px"
@@ -80,9 +83,10 @@ object RanstaxStyle : StyleSheet() {
         }
         "button" style {
             backgroundColor(cognac)
-            fontSize(12.pt)
+            fontSize(mediumFontSize)
+            color(cream)
             property("text-transform", "uppercase")
-            fontWeight(600)
+            fontWeight(500)
             roundBorder()
             property("box-shadow", boxShadow)
         }
@@ -160,5 +164,13 @@ object RanstaxStyle : StyleSheet() {
         maxHeight(20.vh)
         minWidth(80.vw)
         overflowY("scroll")
+    }
+    val largeButton by style {
+        padding(largePadding)
+        fontSize(largeFontSize)
+    }
+    val mediumButton by style {
+        padding(mediumPadding)
+        fontSize(mediumFontSize)
     }
 }

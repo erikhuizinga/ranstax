@@ -293,6 +293,7 @@ private fun DrawButton(
     onDraw: () -> Unit,
 ) {
     Button({
+        classes(RanstaxStyle.largeButton)
         if (ranstaxState.isDrawButtonEnabled) onClick {
             onDraw()
         } else {
@@ -584,6 +585,7 @@ fun Clear(onReset: () -> Unit) {
         Text("🔁 Clear everything")
     }
     Button({
+        classes(RanstaxStyle.mediumButton)
         onClick {
             if (window.confirm(
                     "Do you really want to clear all data?" +
