@@ -173,6 +173,7 @@ private fun RanstaxApp(ranstaxState: RanstaxState, onNewRanstaxState: (RanstaxSt
         Column(
             attrs = { classes(RanstaxStyle.mediumElementPadding) },
             { DrawButton(ranstaxState) { onDraw(1, ranstaxState, onNewRanstaxState) } },
+            { InfoMessage(ranstaxState) },
             { History(ranstaxState) },
             { StackList(ranstaxState, onNewRanstaxState, onEditingChange) },
             {
@@ -291,81 +292,75 @@ private fun DrawButton(
     ranstaxState: RanstaxState,
     onDraw: () -> Unit,
 ) {
-    Column(
-        composables = arrayOf(
-            {
-                Button({
-                    if (ranstaxState.isDrawButtonEnabled) onClick {
-                        onDraw()
-                    } else {
-                        disabled()
-                    }
-                }) {
-                    Text("draw")
+    Button({
+        if (ranstaxState.isDrawButtonEnabled) onClick {
+            onDraw()
+        } else {
+            disabled()
+        }
+    }) {
+        Text("draw")
+    }
+}
+
+@Composable
+private fun InfoMessage(ranstaxState: RanstaxState) {
+    Text(
+        when (ranstaxState.hasStacks) {
+            true -> when (ranstaxState.areAllStacksEmpty) {
+                true -> "🫥 Nothing left to draw, stacks are empty"
+                false -> when (ranstaxState.stacksBeingEdited.isEmpty()) {
+                    true -> "ℹ️ Press any number key to draw that many items"
+                    false -> "⚠️ Finish editing all stacks to enable the draw button"
                 }
-            },
-            {
-                if (ranstaxState.hasStacks && ranstaxState.areAllStacksEmpty) {
-                    Text("🫥 Nothing left to draw, stacks are empty")
-                } else if (ranstaxState.stacksBeingEdited.isNotEmpty()) {
-                    Text("⚠️ Finish editing all stacks to enable the draw button")
-                } else if (ranstaxState.isDrawButtonEnabled) {
-                    Text("ℹ️ Press any number key to draw that many items")
-                } else if (!ranstaxState.hasStacks) {
-                    Text("👇 No stacks, add some new ones")
-                }
-            },
-        )
+            }
+
+            false -> "No stacks, add some new ones"
+        }
     )
 }
 
 @Composable
 private fun History(ranstaxState: RanstaxState) {
     val drawnStackNames = ranstaxState.drawnStackNames
-    if (drawnStackNames.isEmpty()) {
-        if (ranstaxState.hasStacks) {
-            Text("👆 Draw to start history")
-        }
-    } else {
-        H3 {
-            Text("📜 History")
-        }
-
-        Div({
-            classes(
-                RanstaxStyle.history,
-                RanstaxStyle.borderRadius,
-                RanstaxStyle.visibleBorder,
-            )
-        }) {
-            DisposableEffect(drawnStackNames.size) {
-                fun scrollToEnd() {
-                    scopeElement.apply { scrollTop = scrollHeight.toDouble() }
-                }
-                window.onresize = { scrollToEnd() }
-                scrollToEnd()
-                onDispose {}
+    if (drawnStackNames.isEmpty()) return
+    H3 {
+        Text("📜 History")
+    }
+    Div({
+        classes(
+            RanstaxStyle.history,
+            RanstaxStyle.borderRadius,
+            RanstaxStyle.visibleBorder,
+        )
+    }) {
+        DisposableEffect(drawnStackNames.size) {
+            fun scrollToEnd() {
+                scopeElement.apply { scrollTop = scrollHeight.toDouble() }
             }
+            window.onresize = { scrollToEnd() }
+            scrollToEnd()
+            onDispose {}
+        }
 
-            val indexTemplate = "\$index"
-            val nameTemplate = "\$name"
-            val indexedNameTemplate = "$indexTemplate: $nameTemplate"
-            val indexLength =
-                ceil(log10((ranstaxState.totalStackSize + drawnStackNames.sumOf { it.size } + 1).toDouble())).roundToInt()
-            var index = 0
-            drawnStackNames.forEach { drawActionStackNames ->
+        val indexTemplate = "\$index"
+        val nameTemplate = "\$name"
+        val indexedNameTemplate = "$indexTemplate: $nameTemplate"
+        val indexLength =
+            ceil(log10((ranstaxState.totalStackSize + drawnStackNames.sumOf { it.size } + 1).toDouble())).roundToInt()
+        var index = 0
+        drawnStackNames.forEach { drawActionStackNames ->
+            Div {
+                Text("Drew ${drawActionStackNames.size} 👇")
+            }
+            drawActionStackNames.map { stackName ->
+                val indexString = (++index).toString()
+                indexedNameTemplate.replace(
+                    indexTemplate, "0".repeat(indexLength - indexString.length) + indexString
+                ).replace(nameTemplate, stackName)
+            }.forEach {
                 Div {
-                    Text("Drew ${drawActionStackNames.size} 👇")
-                }
-                drawActionStackNames.map { stackName ->
-                    val indexString = (++index).toString()
-                    indexedNameTemplate.replace(
-                        indexTemplate, "0".repeat(indexLength - indexString.length) + indexString
-                    ).replace(nameTemplate, stackName)
-                }.forEach {
-                    Div {
-                        Text(it)
-                    }
+                    Text(it)
                 }
             }
         }
