@@ -322,9 +322,12 @@ private fun InfoMessage(ranstaxState: RanstaxState) {
 @Composable
 private fun History(ranstaxState: RanstaxState) {
     val drawnStackNames = ranstaxState.drawnStackNames
-    if (drawnStackNames.isEmpty()) return
     H3 {
         Text("📜 History")
+    }
+    if (drawnStackNames.isEmpty()) {
+        Text("Draw to start history")
+        return
     }
     Div({
         classes(
