@@ -311,6 +311,8 @@ private fun DrawButton(
                     Text("⚠️ Finish editing all stacks to enable the draw button")
                 } else if (ranstaxState.isDrawButtonEnabled) {
                     Text("ℹ️ Press any number key to draw that many items")
+                } else if (!ranstaxState.hasStacks) {
+                    Text("👇 No stacks, add some new ones")
                 }
             },
         )
@@ -378,7 +380,6 @@ private fun StackList(
 ) {
     val stacks = ranstaxState.stacks
     if (stacks.isEmpty()) {
-        Text("No stacks, add some new ones")
         return
     }
     H3 {
