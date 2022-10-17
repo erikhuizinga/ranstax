@@ -25,6 +25,7 @@ import org.jetbrains.compose.web.css.marginBottom
 import org.jetbrains.compose.web.css.maxHeight
 import org.jetbrains.compose.web.css.minWidth
 import org.jetbrains.compose.web.css.minus
+import org.jetbrains.compose.web.css.opacity
 import org.jetbrains.compose.web.css.overflowY
 import org.jetbrains.compose.web.css.padding
 import org.jetbrains.compose.web.css.paddingBottom
@@ -89,6 +90,9 @@ object RanstaxStyle : StyleSheet() {
             fontWeight(500)
             roundBorder()
             property("box-shadow", boxShadow)
+        }
+        type("button") + attr("disabled") style {
+            opacity(0.3)
         }
         "input" style {
             backgroundColor(cream)
