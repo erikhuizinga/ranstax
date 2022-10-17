@@ -1,5 +1,6 @@
 import org.jetbrains.compose.web.css.AlignItems
 import org.jetbrains.compose.web.css.CSSSizeValue
+import org.jetbrains.compose.web.css.CSSStyleRuleBuilder
 import org.jetbrains.compose.web.css.Color
 import org.jetbrains.compose.web.css.DisplayStyle
 import org.jetbrains.compose.web.css.FlexDirection
@@ -82,12 +83,17 @@ object RanstaxStyle : StyleSheet() {
             fontSize(12.pt)
             property("text-transform", "uppercase")
             fontWeight(600)
-            border(style = LineStyle.None)
+            roundBorder()
             property("box-shadow", boxShadow)
         }
         "input" style {
             backgroundColor(cream)
         }
+    }
+
+    private fun CSSStyleRuleBuilder.roundBorder() {
+        borderRadius(borderRadiusSize)
+        border(style = LineStyle.None)
     }
 
     val layout by style {
@@ -143,8 +149,7 @@ object RanstaxStyle : StyleSheet() {
         padding(mediumPadding)
     }
     val borderRadius by style {
-        borderRadius(borderRadiusSize)
-        border(style = LineStyle.None)
+        roundBorder()
     }
     val visibleBorder by style {
         border(1.px, LineStyle.Solid, gray)
