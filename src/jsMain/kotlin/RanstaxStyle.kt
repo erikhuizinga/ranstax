@@ -14,17 +14,14 @@ import org.jetbrains.compose.web.css.borderRadius
 import org.jetbrains.compose.web.css.boxSizing
 import org.jetbrains.compose.web.css.color
 import org.jetbrains.compose.web.css.display
-import org.jetbrains.compose.web.css.em
 import org.jetbrains.compose.web.css.flexFlow
 import org.jetbrains.compose.web.css.fontFamily
 import org.jetbrains.compose.web.css.fontSize
-import org.jetbrains.compose.web.css.fontWeight
 import org.jetbrains.compose.web.css.height
 import org.jetbrains.compose.web.css.margin
 import org.jetbrains.compose.web.css.marginBottom
 import org.jetbrains.compose.web.css.maxHeight
 import org.jetbrains.compose.web.css.minWidth
-import org.jetbrains.compose.web.css.minus
 import org.jetbrains.compose.web.css.opacity
 import org.jetbrains.compose.web.css.overflowY
 import org.jetbrains.compose.web.css.padding
@@ -40,7 +37,6 @@ import org.jetbrains.compose.web.css.value
 import org.jetbrains.compose.web.css.variable
 import org.jetbrains.compose.web.css.vh
 import org.jetbrains.compose.web.css.vw
-import org.jetbrains.compose.web.css.whiteSpace
 import org.jetbrains.compose.web.css.width
 
 
@@ -81,13 +77,13 @@ object RanstaxStyle : StyleSheet() {
         "html, body" style {
             height(100.percent)
             backgroundColor(cream)
+            sansSerifFont()
         }
         "button" style {
             backgroundColor(cognac)
             fontSize(mediumFontSize)
+            headerFont()
             color(cream)
-            property("text-transform", "uppercase")
-            fontWeight(500)
             roundBorder()
             property("box-shadow", boxShadow)
         }
@@ -96,7 +92,27 @@ object RanstaxStyle : StyleSheet() {
         }
         "input" style {
             backgroundColor(cream)
+            sansSerifFont()
         }
+        "h1, h2, h3, h4, h5, h6" style {
+            headerFont()
+        }
+    }
+
+    private fun CSSStyleRuleBuilder.titleFont() {
+        fontFamily("Barriecito", "sans-serif")
+    }
+
+    private fun CSSStyleRuleBuilder.headerFont() {
+        fontFamily("Carter One", "sans-serif")
+    }
+
+    private fun CSSStyleRuleBuilder.monospaceFont() {
+        fontFamily("Ubuntu Mono", "monospace")
+    }
+
+    private fun CSSStyleRuleBuilder.sansSerifFont() {
+        fontFamily("Ubuntu", "sans-serif")
     }
 
     private fun CSSStyleRuleBuilder.roundBorder() {
@@ -143,13 +159,12 @@ object RanstaxStyle : StyleSheet() {
         paddingLeft(elementPadding.value())
     }
     val header by style {
-        whiteSpace("pre")
-        fontFamily("monospace")
-        fontWeight(900)
+        titleFont()
+        fontSize(64.pt)
         color(cream)
         backgroundColor(kellyGreen)
         padding(largePadding)
-        paddingTop(largePadding - 1.em)
+        paddingTop(largePadding)
         marginBottom(largeMargin)
         width(100.vw)
         property("box-shadow", boxShadow)
@@ -165,7 +180,7 @@ object RanstaxStyle : StyleSheet() {
     }
     val history by style {
         padding(mediumPadding)
-        fontFamily("monospace")
+        monospaceFont()
         maxHeight(20.vh)
         minWidth(80.vw)
         overflowY("scroll")

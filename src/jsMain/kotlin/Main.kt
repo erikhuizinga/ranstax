@@ -130,7 +130,7 @@ fun RowFooter(child: @Composable () -> Unit) {
 @Composable
 fun RanstaxHeader() {
     Div({ classes(RanstaxStyle.header) }) {
-        Text(ranstaxHeaders.random())
+        Text("Ranstax")
     }
 }
 
@@ -298,7 +298,7 @@ private fun DrawButton(
             disabled()
         }
     }) {
-        Text("draw")
+        Text("Draw")
     }
 }
 
@@ -597,6 +597,6 @@ fun Clear(onReset: () -> Unit) {
             }
         }
     }) {
-        Text("clear")
+        Text("Clear")
     }
 }
