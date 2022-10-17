@@ -13,7 +13,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Gradle Wrapper Validation
-        uses: gradle/wrapper-validation-action@v1.0.4
+        uses: gradle/wrapper-validation-action@v1
   build:
     needs: gradle_wrapper_validation
     runs-on: ubuntu-latest
@@ -21,7 +21,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Build
-        uses: gradle/gradle-build-action@v2.3.2
+        uses: gradle/gradle-build-action@v2
         with:
           arguments:
             build
