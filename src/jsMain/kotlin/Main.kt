@@ -185,7 +185,7 @@ private fun RanstaxApp(ranstaxState: RanstaxState, onNewRanstaxState: (RanstaxSt
                     onEditingChange = onEditingChange,
                 )
             },
-            { Reset { onNewRanstaxState(RanstaxState()) } },
+            { Clear { onNewRanstaxState(RanstaxState()) } },
         )
     }
 }
@@ -579,20 +579,21 @@ private fun StackEditor(
 }
 
 @Composable
-fun Reset(onReset: () -> Unit) {
+fun Clear(onReset: () -> Unit) {
     H3 {
-        Text("🔁 Reset app")
+        Text("🔁 Clear everything")
     }
     Button({
         onClick {
             if (window.confirm(
-                    "Do you really want to reset all data?" + " If you choose to reset, you will lose all current data."
+                    "Do you really want to clear all data?" +
+                            " If you choose to clear, you will lose all current data."
                 )
             ) {
                 onReset()
             }
         }
     }) {
-        Text("reset")
+        Text("clear")
     }
 }
