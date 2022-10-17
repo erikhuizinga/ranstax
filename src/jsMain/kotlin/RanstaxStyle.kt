@@ -150,7 +150,7 @@ object RanstaxStyle : StyleSheet() {
     val row by style {
         display(DisplayStyle.Flex)
         flexFlow(FlexDirection.Row, FlexWrap.Wrap)
-        alignItems(AlignItems.Normal)
+        alignItems(AlignItems.Center)
     }
     val rowHeader by style {
         paddingRight(elementPadding.value())
