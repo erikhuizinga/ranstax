@@ -34,8 +34,9 @@ import org.w3c.dom.events.EventTarget
 import org.w3c.dom.events.KeyboardEvent
 import org.w3c.dom.get
 import org.w3c.dom.set
+import org.w3c.dom.url.URLSearchParams
 
-private const val debug = true
+private val debug = URLSearchParams(document.location?.search).get("debug").toBoolean()
 
 private fun log(m: String) {
     if (debug) println(m)
