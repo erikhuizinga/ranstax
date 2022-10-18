@@ -169,13 +169,12 @@ private fun RanstaxApp(ranstaxState: RanstaxState, onNewRanstaxState: (RanstaxSt
         onNewRanstaxState(ranstaxState.copy(isEditing = isEditing))
     }
     Div({ classes(RanstaxStyle.app) }) {
-        Column(
-            attrs = { classes(RanstaxStyle.mediumElementPadding) },
-            { DrawButton(ranstaxState) { onDraw(1, ranstaxState, onNewRanstaxState) } },
-            { InfoMessage(ranstaxState) },
-            { History(ranstaxState) },
-            { StackList(ranstaxState, onNewRanstaxState, onEditingChange) },
-            {
+        Column({ classes(RanstaxStyle.mediumElementPadding) }) {
+            item { DrawButton(ranstaxState) { onDraw(1, ranstaxState, onNewRanstaxState) } }
+            item { InfoMessage(ranstaxState) }
+            item { History(ranstaxState) }
+            item { StackList(ranstaxState, onNewRanstaxState, onEditingChange) }
+            item {
                 NewStackInput(
                     isValidName = { stacks.none { it.name == trim() } },
                     onNewStack = {
@@ -183,9 +182,9 @@ private fun RanstaxApp(ranstaxState: RanstaxState, onNewRanstaxState: (RanstaxSt
                     },
                     onEditingChange = onEditingChange,
                 )
-            },
-            { Clear { onNewRanstaxState(RanstaxState()) } },
-        )
+            }
+            item { Clear { onNewRanstaxState(RanstaxState()) } }
+        }
     }
 }
 
@@ -223,15 +222,8 @@ private fun onDraw(
 
 @Composable
 fun Column(
-    vararg composables: @Composable () -> Unit,
-) {
-    Column(null, *composables)
-}
-
-@Composable
-fun Column(
     attrs: AttrBuilderContext<HTMLDivElement>? = null,
-    vararg composables: @Composable () -> Unit,
+    content: @Composable ListScope.() -> Unit,
 ) {
     HeaderItemsFooterList(
         attrs = {
@@ -241,8 +233,18 @@ fun Column(
         Header = { ColumnHeader(it) },
         Element = { ColumnElement(it) },
         Footer = { ColumnFooter(it) },
-        composables = composables
+        content = content,
     )
+}
+
+interface ListScope {
+    fun item(content: @Composable () -> Unit)
+}
+
+internal class HeaderItemFooterListScope internal constructor() : ListScope {
+    private val privateItems = mutableListOf<@Composable () -> Unit>()
+    val items: List<@Composable () -> Unit> = privateItems
+    override fun item(content: @Composable () -> Unit) = privateItems.plusAssign(content)
 }
 
 @Composable
@@ -251,38 +253,38 @@ private fun HeaderItemsFooterList(
     Header: @Composable (@Composable () -> Unit) -> Unit,
     Element: @Composable (@Composable () -> Unit) -> Unit,
     Footer: @Composable (@Composable () -> Unit) -> Unit,
-    vararg composables: @Composable () -> Unit,
+    content: @Composable ListScope.() -> Unit,
 ) {
+    val items = HeaderItemFooterListScope()
+        .apply { content() }
+        .items
+        .takeIf { it.isNotEmpty() }
+        ?: return
+
     Div({
         classes(RanstaxStyle.smallElementPadding)
         attrs()
     }) {
-        when (composables.size) {
-            0 -> {}
-            1 -> composables[0]()
+        when (items.size) {
+            1 -> items[0]()
             else -> {
-                Header(composables[0])
-                val tail = composables.drop(1)
+                Header(items[0])
+                val tail = items.drop(1)
                 tail.dropLast(1).forEach { Element(it) }
-                Footer(composables.last())
+                Footer(items.last())
             }
         }
     }
 }
 
 @Composable
-fun Column(composables: List<@Composable () -> Unit>) {
-    Column(*composables.toTypedArray())
-}
-
-@Composable
-fun Row(vararg composables: @Composable () -> Unit) {
+fun Row(content: @Composable ListScope.() -> Unit) {
     HeaderItemsFooterList(
         attrs = { classes(RanstaxStyle.row) },
         Header = { RowHeader(it) },
         Element = { RowElement(it) },
         Footer = { RowFooter(it) },
-        composables = composables
+        content = content,
     )
 }
 
@@ -384,44 +386,44 @@ private fun StackList(
         Text("📚 Stacks")
     }
     val stacksBeingEdited = ranstaxState.stacksBeingEdited
-    Column(stacks.map<Stack, @Composable () -> Unit> { stack ->
-        {
-            if (stack in stacksBeingEdited) {
-                StackEditor(
-                    currentStack = stack,
-                    isValidName = {
-                        val trimmedName = trim()
-                        stacksBeingEdited.any { it.name == trimmedName } || stacks.none { it.name == trimmedName }
-                    },
-                    onSave = { savedStack ->
-                        onNewRanstaxState(
-                            ranstaxState.copy(
-                                stacks = stacks.map { if (it == stack) savedStack else it },
-                                stacksBeingEdited = stacksBeingEdited - stack
+    Column {
+        stacks.forEach { stack ->
+            item {
+                if (stack in stacksBeingEdited) {
+                    StackEditor(
+                        currentStack = stack,
+                        isValidName = {
+                            val trimmedName = trim()
+                            stacksBeingEdited.any { it.name == trimmedName } || stacks.none { it.name == trimmedName }
+                        },
+                        onSave = { savedStack ->
+                            onNewRanstaxState(
+                                ranstaxState.copy(
+                                    stacks = stacks.map { if (it == stack) savedStack else it },
+                                    stacksBeingEdited = stacksBeingEdited - stack,
+                                )
                             )
-                        )
-                    },
-                    onDelete = {
-                        onNewRanstaxState(
-                            ranstaxState.copy(
-                                stacks = stacks - stack,
-                                stacksBeingEdited = stacksBeingEdited - stack
+                        },
+                        onDelete = {
+                            onNewRanstaxState(
+                                ranstaxState.copy(
+                                    stacks = stacks - stack,
+                                    stacksBeingEdited = stacksBeingEdited - stack,
+                                )
                             )
-                        )
-                    },
-                    onEditingChange = onEditingChange,
-                )
-            } else {
-                EditableStack(stack) {
-                    onNewRanstaxState(
-                        ranstaxState.copy(
-                            stacksBeingEdited = stacksBeingEdited + stack
-                        )
+                        },
+                        onEditingChange = onEditingChange,
                     )
+                } else {
+                    EditableStack(stack) {
+                        onNewRanstaxState(
+                            ranstaxState.copy(stacksBeingEdited = stacksBeingEdited + stack)
+                        )
+                    }
                 }
             }
         }
-    })
+    }
 }
 
 @Composable
@@ -448,8 +450,8 @@ private fun NewStackInput(
     H3 {
         Text("🆕 New stack")
     }
-    Row(
-        {
+    Row {
+        item {
             StackInput(
                 stack = stack,
                 onInput = { (newName, newSize) ->
@@ -463,8 +465,8 @@ private fun NewStackInput(
                 },
                 onEditingChange = onEditingChange,
             )
-        },
-        {
+        }
+        item {
             Button({
                 if (stack.validate()) onClick {
                     onNewStackAndResetState()
@@ -474,8 +476,8 @@ private fun NewStackInput(
             }) {
                 Text("➕")
             }
-        },
-    )
+        }
+    }
 }
 
 @Composable
@@ -491,8 +493,8 @@ private fun StackInput(
             it.preventDefault()
         }
     }
-    Row(
-        {
+    Row {
+        item {
             TextInput(value = stack.name) {
                 placeholder("enter a name")
                 onInput { onInput(stack.copy(name = it.value)) }
@@ -500,8 +502,8 @@ private fun StackInput(
                 onFocus { onEditingChange(true) }
                 onBlur { onEditingChange(false) }
             }
-        },
-        {
+        }
+        item {
             val minSize = 0
             val maxSize = Int.MAX_VALUE
             NumberInput(value = stack.size, min = minSize, max = maxSize) {
@@ -515,8 +517,8 @@ private fun StackInput(
                 onFocus { onEditingChange(true) }
                 onBlur { onEditingChange(false) }
             }
-        },
-    )
+        }
+    }
 }
 
 @Composable
@@ -524,16 +526,16 @@ private fun EditableStack(
     stack: Stack,
     onEdit: () -> Unit,
 ) {
-    Row(
-        {
+    Row {
+        item {
             Button({ onClick { onEdit() } }) {
                 Text("✏️")
             }
-        },
-        {
+        }
+        item {
             Stack(stack)
-        },
-    )
+        }
+    }
 }
 
 @Composable
@@ -553,8 +555,8 @@ private fun StackEditor(
 ) {
     var stack by remember { mutableStateOf(currentStack) }
     fun Stack.validate() = isValid && name.isValidName()
-    Row(
-        {
+    Row {
+        item {
             Button({
                 if (stack.validate()) onClick {
                     onSave(stack.trimmedName())
@@ -564,21 +566,21 @@ private fun StackEditor(
             }) {
                 Text("💾")
             }
-        },
-        {
+        }
+        item {
             Button({ onClick { onDelete() } }) {
                 Text("🗑")
             }
-        },
-        {
+        }
+        item {
             StackInput(
                 stack = stack,
                 onInput = { stack = it },
                 onSubmit = { stack.takeIf { it.validate() }?.run(Stack::trimmedName)?.let(onSave) },
                 onEditingChange = onEditingChange
             )
-        },
-    )
+        }
+    }
 }
 
 @Composable
