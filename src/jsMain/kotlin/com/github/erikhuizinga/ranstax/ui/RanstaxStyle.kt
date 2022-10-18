@@ -1,3 +1,5 @@
+package com.github.erikhuizinga.ranstax.ui
+
 import org.jetbrains.compose.web.css.AlignItems
 import org.jetbrains.compose.web.css.CSSSizeValue
 import org.jetbrains.compose.web.css.CSSStyleRuleBuilder
