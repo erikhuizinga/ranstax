@@ -11,13 +11,9 @@ fun EditableStack(
     onEdit: () -> Unit,
 ) {
     Row {
-        item {
-            Button({ onClick { onEdit() } }) {
-                Text("✏️")
-            }
+        Button({ onClick { onEdit() } }) {
+            Text("✏️")
         }
-        item {
-            StackComponent(stack)
-        }
+        StackComponent(stack)
     }
 }

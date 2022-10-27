@@ -22,22 +22,22 @@ fun RanstaxApp(ranstaxState: RanstaxState, onNewRanstaxState: (RanstaxState) -> 
     val onEditingChange = { isEditing: Boolean ->
         onNewRanstaxState(ranstaxState.copy(isEditing = isEditing))
     }
+
     Div({ classes(RanstaxStyle.app) }) {
-        Column({ classes(RanstaxStyle.mediumElementPadding) }) {
-            item { DrawButton(ranstaxState) { onDraw(1, ranstaxState, onNewRanstaxState) } }
-            item { InfoMessage(ranstaxState) }
-            item { History(ranstaxState) }
-            item { StackList(ranstaxState, onNewRanstaxState, onEditingChange) }
-            item {
-                NewStackInput(
-                    isValidName = { stacks.none { it.name == trim() } },
-                    onNewStack = {
-                        onNewRanstaxState(ranstaxState.copy(stacks = stacks + it))
-                    },
-                    onEditingChange = onEditingChange,
-                )
-            }
-            item { Clear { onNewRanstaxState(RanstaxState()) } }
+        Column {
+            DrawButton(ranstaxState) { onDraw(1, ranstaxState, onNewRanstaxState) }
+            InfoMessage(ranstaxState)
+            History(ranstaxState)
+            StackList(ranstaxState, onNewRanstaxState, onEditingChange)
+
+            NewStackInput(
+                onNewStack = {
+                    onNewRanstaxState(ranstaxState.copy(stacks = stacks + it))
+                },
+                onEditingChange = onEditingChange,
+                ranstaxState = ranstaxState,
+            )
+            Clear { onNewRanstaxState(RanstaxState()) }
         }
     }
 }

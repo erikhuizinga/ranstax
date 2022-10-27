@@ -24,29 +24,25 @@ fun StackInput(
         }
     }
     Row {
-        item {
-            TextInput(value = stack.name) {
-                placeholder("enter a name")
-                onInput { onInput(stack.copy(name = it.value)) }
-                onKeyUp(submitListener)
-                onFocus { onEditingChange(true) }
-                onBlur { onEditingChange(false) }
-            }
+        TextInput(value = stack.name) {
+            placeholder("enter a name")
+            onInput { onInput(stack.copy(name = it.value)) }
+            onKeyUp(submitListener)
+            onFocus { onEditingChange(true) }
+            onBlur { onEditingChange(false) }
         }
-        item {
-            val minSize = 0
-            val maxSize = Int.MAX_VALUE
-            NumberInput(value = stack.size, min = minSize, max = maxSize) {
-                placeholder("size")
-                size(maxSize.toString().length)
-                onInput {
-                    it.value?.toInt()?.takeIf { newSize -> newSize in minSize..maxSize }
-                        ?.let { newSize -> onInput(stack.copy(size = newSize)) }
-                }
-                onKeyUp(submitListener)
-                onFocus { onEditingChange(true) }
-                onBlur { onEditingChange(false) }
+        val minSize = 0
+        val maxSize = Int.MAX_VALUE
+        NumberInput(value = stack.size, min = minSize, max = maxSize) {
+            placeholder("size")
+            size(maxSize.toString().length)
+            onInput {
+                it.value?.toInt()?.takeIf { newSize -> newSize in minSize..maxSize }
+                    ?.let { newSize -> onInput(stack.copy(size = newSize)) }
             }
+            onKeyUp(submitListener)
+            onFocus { onEditingChange(true) }
+            onBlur { onEditingChange(false) }
         }
     }
 }

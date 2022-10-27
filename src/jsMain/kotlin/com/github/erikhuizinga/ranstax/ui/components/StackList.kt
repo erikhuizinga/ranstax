@@ -21,38 +21,33 @@ fun StackList(
     val stacksBeingEdited = ranstaxState.stacksBeingEdited
     Column {
         stacks.forEach { stack ->
-            item {
-                if (stack in stacksBeingEdited) {
-                    StackEditor(
-                        currentStack = stack,
-                        isValidName = {
-                            val trimmedName = trim()
-                            stacksBeingEdited.any { it.name == trimmedName } || stacks.none { it.name == trimmedName }
-                        },
-                        onSave = { savedStack ->
-                            onNewRanstaxState(
-                                ranstaxState.copy(
-                                    stacks = stacks.map { if (it == stack) savedStack else it },
-                                    stacksBeingEdited = stacksBeingEdited - stack,
-                                )
-                            )
-                        },
-                        onDelete = {
-                            onNewRanstaxState(
-                                ranstaxState.copy(
-                                    stacks = stacks - stack,
-                                    stacksBeingEdited = stacksBeingEdited - stack,
-                                )
-                            )
-                        },
-                        onEditingChange = onEditingChange,
-                    )
-                } else {
-                    EditableStack(stack) {
+            if (stack in stacksBeingEdited) {
+                StackEditor(
+                    currentStack = stack,
+                    onSave = { savedStack ->
                         onNewRanstaxState(
-                            ranstaxState.copy(stacksBeingEdited = stacksBeingEdited + stack)
+                            ranstaxState.copy(
+                                stacks = stacks.map { if (it == stack) savedStack else it },
+                                stacksBeingEdited = stacksBeingEdited - stack,
+                            )
                         )
-                    }
+                    },
+                    onDelete = {
+                        onNewRanstaxState(
+                            ranstaxState.copy(
+                                stacks = stacks - stack,
+                                stacksBeingEdited = stacksBeingEdited - stack,
+                            )
+                        )
+                    },
+                    onEditingChange = onEditingChange,
+                    ranstaxState = ranstaxState,
+                )
+            } else {
+                EditableStack(stack) {
+                    onNewRanstaxState(
+                        ranstaxState.copy(stacksBeingEdited = stacksBeingEdited + stack)
+                    )
                 }
             }
         }
