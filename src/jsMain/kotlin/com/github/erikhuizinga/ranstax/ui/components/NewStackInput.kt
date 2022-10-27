@@ -24,61 +24,63 @@ fun NewStackInput(
     ranstaxState: RanstaxState,
     stackValidator: Validator<Stack, StackValidation> = NewStackValidatorImpl(ranstaxState),
 ) {
-    H3 {
-        Text("🆕 New stack")
-    }
-    Row {
-        val defaultName = ""
-        val defaultSize = 10
-        var name by remember { mutableStateOf(defaultName) }
-        var size by remember { mutableStateOf(defaultSize) }
-
-        val stack = Stack(name, size)
-        val stackValidation = stackValidator(stack)
-        log("NewStackInput: stackValidation = $stackValidation")
-
-        val hintOrNull by remember(ranstaxState.isEditing, stackValidation) {
-            derivedStateOf {
-                log("Evaluating hint or null")
-                stackValidation
-                    .takeIf { it != StackValidation.NameBlank || ranstaxState.isEditing }
-                    ?.hint
-            }
+    Column {
+        H3 {
+            Text("🆕 New stack")
         }
-        log("NewStackInput: ranstaxState.isEditing = ${ranstaxState.isEditing}")
-        log("NewStackInput: hintOrNull = $hintOrNull")
+        Row {
+            val defaultName = ""
+            val defaultSize = 10
+            var name by remember { mutableStateOf(defaultName) }
+            var size by remember { mutableStateOf(defaultSize) }
 
-        fun onNewStackAndResetState() {
-            onNewStack(stack.trimName())
-            name = defaultName
-            size = defaultSize
-        }
+            val stack = Stack(name, size)
+            val stackValidation = stackValidator(stack)
+            log("NewStackInput: stackValidation = $stackValidation")
 
-        StackInput(
-            stack = stack,
-            onInput = { (newName, newSize) ->
-                name = newName
-                size = newSize
-            },
-            onSubmit = {
-                if (stackValidation == StackValidation.Valid) {
-                    onNewStackAndResetState()
+            val hintOrNull by remember(ranstaxState.isEditing, stackValidation) {
+                derivedStateOf {
+                    log("Evaluating hint or null")
+                    stackValidation
+                        .takeIf { it != StackValidation.NameBlank || ranstaxState.isEditing }
+                        ?.hint
                 }
-            },
-            onEditingChange = onEditingChange,
-        )
-        Button({
-            if (stackValidation == StackValidation.Valid) onClick {
-                onNewStackAndResetState()
-            } else {
-                disabled()
             }
-        }) {
-            Text("➕")
-        }
+            log("NewStackInput: ranstaxState.isEditing = ${ranstaxState.isEditing}")
+            log("NewStackInput: hintOrNull = $hintOrNull")
 
-        hintOrNull?.let { hint ->
-            Text(hint)
+            fun onNewStackAndResetState() {
+                onNewStack(stack.trimName())
+                name = defaultName
+                size = defaultSize
+            }
+
+            StackInput(
+                stack = stack,
+                onInput = { (newName, newSize) ->
+                    name = newName
+                    size = newSize
+                },
+                onSubmit = {
+                    if (stackValidation == StackValidation.Valid) {
+                        onNewStackAndResetState()
+                    }
+                },
+                onEditingChange = onEditingChange,
+            )
+            Button({
+                if (stackValidation == StackValidation.Valid) onClick {
+                    onNewStackAndResetState()
+                } else {
+                    disabled()
+                }
+            }) {
+                Text("➕")
+            }
+
+            hintOrNull?.let { hint ->
+                Text(hint)
+            }
         }
     }
 }

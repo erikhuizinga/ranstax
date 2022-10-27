@@ -1,14 +1,15 @@
 package com.github.erikhuizinga.ranstax.ui
 
+import org.jetbrains.compose.web.css.AlignItems
 import org.jetbrains.compose.web.css.CSSBuilder
 import org.jetbrains.compose.web.css.CSSStyleRuleBuilder
 import org.jetbrains.compose.web.css.Color
 import org.jetbrains.compose.web.css.DisplayStyle
 import org.jetbrains.compose.web.css.FlexDirection
 import org.jetbrains.compose.web.css.FlexWrap
-import org.jetbrains.compose.web.css.JustifyContent
 import org.jetbrains.compose.web.css.LineStyle
 import org.jetbrains.compose.web.css.StyleSheet
+import org.jetbrains.compose.web.css.alignItems
 import org.jetbrains.compose.web.css.backgroundColor
 import org.jetbrains.compose.web.css.border
 import org.jetbrains.compose.web.css.borderRadius
@@ -21,7 +22,6 @@ import org.jetbrains.compose.web.css.fontFamily
 import org.jetbrains.compose.web.css.fontSize
 import org.jetbrains.compose.web.css.gap
 import org.jetbrains.compose.web.css.height
-import org.jetbrains.compose.web.css.justifyContent
 import org.jetbrains.compose.web.css.margin
 import org.jetbrains.compose.web.css.marginBottom
 import org.jetbrains.compose.web.css.maxHeight
@@ -55,7 +55,7 @@ object RanstaxStyle : StyleSheet() {
     //region Dimensions
     private val largeMargin = 16.px
 
-    private val smallPadding = 2.px
+    val smallPadding = 2.px
     private val mediumPadding = 8.px
     private val largePadding = 16.px
 
@@ -127,15 +127,18 @@ object RanstaxStyle : StyleSheet() {
     }
 
     val layout by style {
-        flexListStyle(FlexDirection.Column)
+        flexListStyle(flexDirection = FlexDirection.Column)
         boxSizing("border-box")
         height(100.percent)
     }
     val column by style {
-        flexListStyle(FlexDirection.Column)
+        flexListStyle(flexDirection = FlexDirection.Column)
     }
     val row by style {
-        flexListStyle(FlexDirection.Row)
+        flexListStyle(
+            flexDirection = FlexDirection.Row,
+            alignItems = AlignItems.Center,
+        )
     }
     val header by style {
         titleFont()
@@ -150,6 +153,7 @@ object RanstaxStyle : StyleSheet() {
     }
     val app by style {
         padding(mediumPadding)
+        gap(largePadding)
     }
     val borderRadius by style {
         roundBorder()
@@ -176,11 +180,13 @@ object RanstaxStyle : StyleSheet() {
         fontSize(smallFontSize)
     }
 
-    private fun CSSBuilder.flexListStyle(flexDirection: FlexDirection) {
+    private fun CSSBuilder.flexListStyle(
+        flexDirection: FlexDirection,
+        alignItems: AlignItems = AlignItems.Normal,
+    ) {
         flexFlow(flexDirection, FlexWrap.Wrap)
         display(DisplayStyle.Flex)
-        // alignItems(AlignItems.Normal)
-        justifyContent(JustifyContent.SpaceBetween)
-        gap(smallPadding, smallPadding)
+        alignItems(alignItems)
+        gap(mediumPadding, mediumPadding)
     }
 }

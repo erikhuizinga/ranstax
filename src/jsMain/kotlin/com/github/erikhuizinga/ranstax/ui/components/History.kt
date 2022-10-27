@@ -14,51 +14,53 @@ import org.jetbrains.compose.web.dom.Text
 
 @Composable
 fun History(ranstaxState: RanstaxState) {
-    val drawnStackNames = ranstaxState.drawnStackNames
-    H3 {
-        Text("📜 History")
-    }
-    if (drawnStackNames.isEmpty()) {
-        Text("Draw to start history")
-        return
-    }
-    Div({
-        classes(
-            RanstaxStyle.history,
-            RanstaxStyle.borderRadius,
-            RanstaxStyle.visibleBorder,
-        )
-    }) {
-        DisposableEffect(drawnStackNames.size) {
-            fun scrollToEnd() {
-                scopeElement.apply { scrollTop = scrollHeight.toDouble() }
-            }
-            window.onresize = { scrollToEnd() }
-            scrollToEnd()
-            onDispose {}
+    Column {
+        val drawnStackNames = ranstaxState.drawnStackNames
+        H3 {
+            Text("📜 History")
         }
-
-        val indexTemplate = "\$index"
-        val nameTemplate = "\$name"
-        val indexedNameTemplate = "$indexTemplate: $nameTemplate"
-        val indexLength = ceil(
-            log10(
-                (ranstaxState.totalStackSize + drawnStackNames.sumOf { it.size } + 1).toDouble()
+        if (drawnStackNames.isEmpty()) {
+            Text("Draw to start history")
+            return@Column
+        }
+        Div({
+            classes(
+                RanstaxStyle.history,
+                RanstaxStyle.borderRadius,
+                RanstaxStyle.visibleBorder,
             )
-        ).roundToInt()
-        var index = 0
-        drawnStackNames.forEach { drawActionStackNames ->
-            Div {
-                Text("Drew ${drawActionStackNames.size} 👇")
+        }) {
+            DisposableEffect(drawnStackNames.size) {
+                fun scrollToEnd() {
+                    scopeElement.apply { scrollTop = scrollHeight.toDouble() }
+                }
+                window.onresize = { scrollToEnd() }
+                scrollToEnd()
+                onDispose {}
             }
-            drawActionStackNames.map { stackName ->
-                val indexString = (++index).toString()
-                indexedNameTemplate.replace(
-                    indexTemplate, "0".repeat(indexLength - indexString.length) + indexString
-                ).replace(nameTemplate, stackName)
-            }.forEach {
+
+            val indexTemplate = "\$index"
+            val nameTemplate = "\$name"
+            val indexedNameTemplate = "$indexTemplate: $nameTemplate"
+            val indexLength = ceil(
+                log10(
+                    (ranstaxState.totalStackSize + drawnStackNames.sumOf { it.size } + 1).toDouble()
+                )
+            ).roundToInt()
+            var index = 0
+            drawnStackNames.forEach { drawActionStackNames ->
                 Div {
-                    Text(it)
+                    Text("Drew ${drawActionStackNames.size} 👇")
+                }
+                drawActionStackNames.map { stackName ->
+                    val indexString = (++index).toString()
+                    indexedNameTemplate.replace(
+                        indexTemplate, "0".repeat(indexLength - indexString.length) + indexString
+                    ).replace(nameTemplate, stackName)
+                }.forEach {
+                    Div {
+                        Text(it)
+                    }
                 }
             }
         }

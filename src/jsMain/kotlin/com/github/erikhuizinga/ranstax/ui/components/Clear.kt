@@ -9,21 +9,23 @@ import org.jetbrains.compose.web.dom.Text
 
 @Composable
 fun Clear(onReset: () -> Unit) {
-    H3 {
-        Text("🔁 Clear everything")
-    }
-    Button({
-        classes(RanstaxStyle.mediumButton)
-        onClick {
-            if (window.confirm(
-                    "Do you really want to clear all data?" +
-                            " If you choose to clear, you will lose all current data."
-                )
-            ) {
-                onReset()
-            }
+    Column {
+        H3 {
+            Text("🔁 Clear everything")
         }
-    }) {
-        Text("Clear")
+        Button({
+            classes(RanstaxStyle.mediumButton)
+            onClick {
+                if (window.confirm(
+                        "Do you really want to clear all data?" +
+                                " If you choose to clear, you will lose all current data."
+                    )
+                ) {
+                    onReset()
+                }
+            }
+        }) {
+            Text("Clear")
+        }
     }
 }
