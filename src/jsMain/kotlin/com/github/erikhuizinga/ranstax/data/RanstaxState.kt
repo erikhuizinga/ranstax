@@ -1,12 +1,14 @@
 package com.github.erikhuizinga.ranstax.data
 
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 
 @Serializable
 data class RanstaxState(
     val stacks: List<Stack> = emptyList(),
     val stacksBeingEdited: List<Stack> = emptyList(),
     val drawnStackNames: List<List<String>> = emptyList(),
+    @Transient
     val isEditing: Boolean = false,
 ) {
     init {
