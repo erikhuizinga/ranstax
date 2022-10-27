@@ -5,6 +5,6 @@ import org.w3c.dom.url.URLSearchParams
 
 internal val DEBUG = URLSearchParams(document.location?.search).get("debug").toBoolean()
 
-internal fun log(m: String) {
+internal fun log(m: Any?) {
     if (DEBUG) println(m)
 }
