@@ -25,6 +25,7 @@ import org.jetbrains.compose.web.css.height
 import org.jetbrains.compose.web.css.margin
 import org.jetbrains.compose.web.css.marginBottom
 import org.jetbrains.compose.web.css.maxHeight
+import org.jetbrains.compose.web.css.minHeight
 import org.jetbrains.compose.web.css.minWidth
 import org.jetbrains.compose.web.css.opacity
 import org.jetbrains.compose.web.css.overflowY
@@ -165,6 +166,7 @@ object RanstaxStyle : StyleSheet() {
         padding(mediumPadding)
         monospaceFont()
         maxHeight(20.vh)
+        minHeight(10.em)
         minWidth(80.vw)
         overflowY("scroll")
     }
