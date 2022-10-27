@@ -110,10 +110,6 @@ object RanstaxStyle : StyleSheet() {
         fontFamily("Carter One", "sans-serif")
     }
 
-    private fun CSSStyleRuleBuilder.monospaceFont() {
-        fontFamily("Ubuntu Mono", "monospace")
-    }
-
     private fun CSSStyleRuleBuilder.sansSerifFont() {
         fontFamily("Ubuntu", "sans-serif")
     }
@@ -164,7 +160,6 @@ object RanstaxStyle : StyleSheet() {
     }
     val history by style {
         padding(mediumPadding)
-        monospaceFont()
         maxHeight(20.vh)
         minHeight(10.em)
         minWidth(80.vw)
