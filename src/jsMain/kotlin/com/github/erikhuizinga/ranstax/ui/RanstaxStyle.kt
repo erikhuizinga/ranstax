@@ -16,6 +16,7 @@ import org.jetbrains.compose.web.css.borderRadius
 import org.jetbrains.compose.web.css.boxSizing
 import org.jetbrains.compose.web.css.color
 import org.jetbrains.compose.web.css.display
+import org.jetbrains.compose.web.css.em
 import org.jetbrains.compose.web.css.flexFlow
 import org.jetbrains.compose.web.css.fontFamily
 import org.jetbrains.compose.web.css.fontSize
@@ -65,8 +66,9 @@ object RanstaxStyle : StyleSheet() {
 
     private val elementPadding by variable<CSSSizeValue<*>>()
 
-    private val mediumFontSize = 12.pt
-    private val largeFontSize = 20.pt
+    private val smallFontSize = 0.8.em
+    private val mediumFontSize = 1.em
+    private val largeFontSize = 2.em
     //endregion
 
     private val boxShadow = "$shadow 0px 2px 4px 0px"
@@ -194,5 +196,8 @@ object RanstaxStyle : StyleSheet() {
     val mediumButton by style {
         padding(mediumPadding)
         fontSize(mediumFontSize)
+    }
+    val smallFont by style {
+        fontSize(smallFontSize)
     }
 }
