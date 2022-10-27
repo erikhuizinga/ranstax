@@ -5,9 +5,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import com.github.erikhuizinga.ranstax.data.RanstaxState
-import com.github.erikhuizinga.ranstax.data.Stack
 import com.github.erikhuizinga.ranstax.debug.log
 import com.github.erikhuizinga.ranstax.dev.DEV
+import com.github.erikhuizinga.ranstax.dev.setupDevRanstaxState
 import com.github.erikhuizinga.ranstax.ui.RanstaxStyle
 import com.github.erikhuizinga.ranstax.ui.components.Layout
 import com.github.erikhuizinga.ranstax.ui.components.RanstaxApp
@@ -24,14 +24,16 @@ import org.w3c.dom.set
 fun main() {
     log("Debugging enabled")
 
-    if (DEV) {
+    val initialRanstaxState = if (DEV) {
         log("Setting up dev stacks")
-        setupDevStacks()
+        setupDevRanstaxState(loadRanstaxState())
+    } else {
+        loadRanstaxState()
     }
 
     renderComposable(rootElementId = "ranstax") {
         Style(RanstaxStyle)
-        var ranstaxState by remember { mutableStateOf(loadRanstaxState()) }
+        var ranstaxState by remember { mutableStateOf(initialRanstaxState) }
         Layout {
             RanstaxHeader()
             RanstaxApp(ranstaxState) { newRanstaxState ->
@@ -39,18 +41,6 @@ fun main() {
                 ranstaxState = newRanstaxState
             }
         }
-    }
-}
-
-private fun setupDevStacks() {
-    if (loadRanstaxState().stacks.sumOf { it.size } == 0) {
-        val northAmericaStack = Stack("North America", 180)
-        val europeStack = Stack("Europe", 81)
-        val oceaniaStack = Stack("Oceania", 95)
-        val asiaStack = Stack("Asia", 90)
-        val stacks = listOf(northAmericaStack, europeStack, oceaniaStack, asiaStack)
-        val stacksBeingEdited: List<Stack> = listOf(/* northAmericaStack */)
-        storeRanstaxState(RanstaxState(stacks, stacksBeingEdited))
     }
 }
 
