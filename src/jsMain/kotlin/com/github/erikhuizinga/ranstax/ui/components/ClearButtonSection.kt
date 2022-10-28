@@ -3,12 +3,13 @@ package com.github.erikhuizinga.ranstax.ui.components
 import androidx.compose.runtime.Composable
 import com.github.erikhuizinga.ranstax.ui.RanstaxStyle
 import kotlinx.browser.window
+import org.jetbrains.compose.web.attributes.disabled
 import org.jetbrains.compose.web.dom.Button
 import org.jetbrains.compose.web.dom.H3
 import org.jetbrains.compose.web.dom.Text
 
 @Composable
-fun ClearButtonSection(onReset: () -> Unit) {
+fun ClearButtonSection(canClear: Boolean, onReset: () -> Unit) {
     Column {
         H3 {
             Text("🔁 Clear everything")
@@ -24,6 +25,7 @@ fun ClearButtonSection(onReset: () -> Unit) {
                     onReset()
                 }
             }
+            if (!canClear) disabled()
         }) {
             Text("Clear")
         }

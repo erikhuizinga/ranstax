@@ -40,6 +40,8 @@ fun RanstaxApp(
             onEditingChange = onEditingChange,
             ranstaxState = ranstaxState,
         )
-        ClearButtonSection { onNewRanstaxState(RanstaxState()) }
+        ClearButtonSection(
+            ranstaxState.hasStacks || ranstaxState.drawnStackNames.isNotEmpty()
+        ) { onNewRanstaxState(RanstaxState()) }
     }
 }
