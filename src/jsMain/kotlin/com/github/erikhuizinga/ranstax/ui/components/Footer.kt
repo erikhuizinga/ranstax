@@ -11,17 +11,21 @@ fun Footer(
     attrs: AttrBuilderContext<HTMLDivElement>? = null,
 ) {
     Column({ attrs?.invoke(this) }) {
-        val emoji = setOf("💚", "🎲", "☕️", "🃏", "🍀", "👾").random()
+        val emoji = setOf("💚", "🎲", "☕️", "🃏", "🍀", "👾", "🐈‍⬛", "😻", "🐾").random()
         SmallTextSpan("Created with $emoji️ by Erik Huizinga")
         SmallTextSpan("Ranstax is free and open source software")
         Span {
-            SmallTextSpan("Contribute by ")
+            val nbsp = '\u00A0'
+            SmallTextSpan(
+                "Please contribute by reporting issues, " +
+                        "requesting features and by helping develop "
+            )
             A("https://github.com/erikhuizinga/ranstax") {
-                SmallTextSpan("reporting issues, requesting features and by developing this app on GitHub")
+                SmallTextSpan("💻${nbsp}Ranstax${nbsp}on${nbsp}GitHub")
             }
-            SmallTextSpan(" or by ")
+            SmallTextSpan(", or by ")
             A("https://paypal.me/erikhuizinga/") {
-                SmallTextSpan("supporting me")
+                SmallTextSpan("supporting${nbsp}me${nbsp}🙏")
             }
         }
     }
