@@ -23,13 +23,15 @@ import org.jetbrains.compose.web.css.fontSize
 import org.jetbrains.compose.web.css.gap
 import org.jetbrains.compose.web.css.height
 import org.jetbrains.compose.web.css.margin
-import org.jetbrains.compose.web.css.marginBottom
 import org.jetbrains.compose.web.css.maxHeight
 import org.jetbrains.compose.web.css.minHeight
 import org.jetbrains.compose.web.css.minWidth
 import org.jetbrains.compose.web.css.opacity
 import org.jetbrains.compose.web.css.overflowY
 import org.jetbrains.compose.web.css.padding
+import org.jetbrains.compose.web.css.paddingBottom
+import org.jetbrains.compose.web.css.paddingLeft
+import org.jetbrains.compose.web.css.paddingRight
 import org.jetbrains.compose.web.css.paddingTop
 import org.jetbrains.compose.web.css.percent
 import org.jetbrains.compose.web.css.pt
@@ -54,11 +56,9 @@ object RanstaxStyle : StyleSheet() {
     //endregion
 
     //region Dimensions
-    private val largeMargin = 16.px
-
-    val smallPadding = 2.px
-    private val mediumPadding = 8.px
-    private val largePadding = 16.px
+    val smallSize = 2.px
+    private val mediumSize = 8.px
+    private val largeSize = 20.px
 
     private val borderRadiusSize = 2.px
 
@@ -142,15 +142,16 @@ object RanstaxStyle : StyleSheet() {
         fontSize(64.pt)
         color(cream)
         backgroundColor(kellyGreen)
-        padding(largePadding)
-        paddingTop(largePadding)
-        marginBottom(largeMargin)
+        paddingTop(mediumSize)
+        paddingBottom(mediumSize)
+        paddingLeft(largeSize)
+        paddingRight(largeSize)
         width(100.percent)
         property("box-shadow", boxShadow)
     }
     val app by style {
-        padding(mediumPadding)
-        gap(largePadding)
+        padding(mediumSize)
+        gap(largeSize)
     }
     val borderRadius by style {
         roundBorder()
@@ -159,18 +160,18 @@ object RanstaxStyle : StyleSheet() {
         border(1.px, LineStyle.Solid, gray)
     }
     val history by style {
-        padding(mediumPadding)
+        padding(mediumSize)
         maxHeight(20.vh)
         minHeight(10.em)
         minWidth(80.vw)
         overflowY("scroll")
     }
     val largeButton by style {
-        padding(largePadding)
+        padding(largeSize)
         fontSize(largeFontSize)
     }
     val mediumButton by style {
-        padding(mediumPadding)
+        padding(mediumSize)
         fontSize(mediumFontSize)
     }
     val smallFont by style {
@@ -184,6 +185,6 @@ object RanstaxStyle : StyleSheet() {
         flexFlow(flexDirection, FlexWrap.Wrap)
         display(DisplayStyle.Flex)
         alignItems(alignItems)
-        gap(mediumPadding, mediumPadding)
+        gap(rowGap = mediumSize, columnGap = mediumSize)
     }
 }

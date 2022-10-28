@@ -22,7 +22,7 @@ fun StackList(
             Text("📚 Stacks")
         }
         val stacksBeingEdited = ranstaxState.stacksBeingEdited
-        Column({ style { rowGap(RanstaxStyle.smallPadding) } }) {
+        Column({ style { rowGap(RanstaxStyle.smallSize) } }) {
             stacks.forEach { stack ->
                 if (stack in stacksBeingEdited) {
                     StackEditor(
