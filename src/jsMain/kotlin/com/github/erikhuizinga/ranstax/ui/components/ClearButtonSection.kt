@@ -8,7 +8,7 @@ import org.jetbrains.compose.web.dom.H3
 import org.jetbrains.compose.web.dom.Text
 
 @Composable
-fun Clear(onReset: () -> Unit) {
+fun ClearButtonSection(onReset: () -> Unit) {
     Column {
         H3 {
             Text("🔁 Clear everything")
