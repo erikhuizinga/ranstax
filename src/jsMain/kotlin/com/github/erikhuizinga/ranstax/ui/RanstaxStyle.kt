@@ -16,6 +16,7 @@ import org.jetbrains.compose.web.css.borderRadius
 import org.jetbrains.compose.web.css.boxSizing
 import org.jetbrains.compose.web.css.color
 import org.jetbrains.compose.web.css.display
+import org.jetbrains.compose.web.css.div
 import org.jetbrains.compose.web.css.em
 import org.jetbrains.compose.web.css.flexFlow
 import org.jetbrains.compose.web.css.flexGrow
@@ -28,7 +29,6 @@ import org.jetbrains.compose.web.css.margin
 import org.jetbrains.compose.web.css.maxHeight
 import org.jetbrains.compose.web.css.maxWidth
 import org.jetbrains.compose.web.css.minHeight
-import org.jetbrains.compose.web.css.minWidth
 import org.jetbrains.compose.web.css.opacity
 import org.jetbrains.compose.web.css.overflowY
 import org.jetbrains.compose.web.css.padding
@@ -37,15 +37,14 @@ import org.jetbrains.compose.web.css.paddingLeft
 import org.jetbrains.compose.web.css.paddingRight
 import org.jetbrains.compose.web.css.paddingTop
 import org.jetbrains.compose.web.css.percent
-import org.jetbrains.compose.web.css.pt
 import org.jetbrains.compose.web.css.px
 import org.jetbrains.compose.web.css.rgba
 import org.jetbrains.compose.web.css.rowGap
 import org.jetbrains.compose.web.css.style
 import org.jetbrains.compose.web.css.textAlign
 import org.jetbrains.compose.web.css.textDecoration
+import org.jetbrains.compose.web.css.times
 import org.jetbrains.compose.web.css.vh
-import org.jetbrains.compose.web.css.vw
 import org.jetbrains.compose.web.css.width
 
 
@@ -68,9 +67,9 @@ object RanstaxStyle : StyleSheet() {
 
     private val borderRadiusSize = 2.px
 
-    private val smallFontSize = 0.85.em
     private val mediumFontSize = 1.em
-    private val largeFontSize = 2.em
+    private val smallFontSize = mediumFontSize / 12 * 10
+    private val largeFontSize = mediumFontSize * 2
     //endregion
 
     private val boxShadow = "$shadow 0px 2px 4px 0px"
@@ -91,11 +90,10 @@ object RanstaxStyle : StyleSheet() {
         "button" style {
             backgroundColor(cognac)
             fontSize(mediumFontSize)
-            headerFont()
+            headingFont()
             color(cream)
             roundBorder()
             property("box-shadow", boxShadow)
-            maxWidth(500.px)
         }
         type("button") + attr("disabled") style {
             opacity(0.3)
@@ -107,7 +105,7 @@ object RanstaxStyle : StyleSheet() {
             roundBorder(LineStyle.Solid)
         }
         "h1, h2, h3, h4, h5, h6" style {
-            headerFont()
+            headingFont()
         }
         "a" style {
             color(cognac)
@@ -123,7 +121,7 @@ object RanstaxStyle : StyleSheet() {
         fontFamily("Barriecito", "sans-serif")
     }
 
-    private fun CSSStyleRuleBuilder.headerFont() {
+    private fun CSSStyleRuleBuilder.headingFont() {
         fontFamily("Carter One", "sans-serif")
     }
 
@@ -163,7 +161,7 @@ object RanstaxStyle : StyleSheet() {
     }
     val header by style {
         titleFont()
-        fontSize(64.pt)
+        fontSize(mediumFontSize * 4)
         color(cream)
         backgroundColor(kellyGreen)
         paddingTop(mediumSize)
@@ -176,6 +174,7 @@ object RanstaxStyle : StyleSheet() {
     val app by style {
         padding(mediumSize)
         gap(largeSize)
+        maxWidth(600.px)
     }
     val footer by style {
         rowGap(smallSize)
@@ -191,8 +190,7 @@ object RanstaxStyle : StyleSheet() {
     val history by style {
         padding(mediumSize)
         maxHeight(20.vh)
-        minHeight(10.em)
-        minWidth(80.vw)
+        minHeight(14.em)
         overflowY("scroll")
     }
     val largeButton by style {
@@ -218,6 +216,9 @@ object RanstaxStyle : StyleSheet() {
         flexGrow(1)
         paddingTop(0.px)
         paddingBottom(0.px)
+        self + " *" style {
+            maxWidth(100.percent)
+        }
     }
 
     private fun CSSBuilder.flexListStyle(
