@@ -124,7 +124,10 @@ object RanstaxStyle : StyleSheet() {
     }
 
     val layout by style {
-        flexListStyle(flexDirection = FlexDirection.Column)
+        flexListStyle(
+            flexDirection = FlexDirection.Column,
+            flexWrap = FlexWrap.Nowrap,
+        )
         boxSizing("border-box")
         height(100.percent)
     }
@@ -181,8 +184,9 @@ object RanstaxStyle : StyleSheet() {
     private fun CSSBuilder.flexListStyle(
         flexDirection: FlexDirection,
         alignItems: AlignItems = AlignItems.Normal,
+        flexWrap: FlexWrap = FlexWrap.Wrap,
     ) {
-        flexFlow(flexDirection, FlexWrap.Wrap)
+        flexFlow(flexDirection, flexWrap)
         display(DisplayStyle.Flex)
         alignItems(alignItems)
         gap(rowGap = mediumSize, columnGap = mediumSize)
