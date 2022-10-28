@@ -24,6 +24,7 @@ import org.jetbrains.compose.web.css.gap
 import org.jetbrains.compose.web.css.height
 import org.jetbrains.compose.web.css.margin
 import org.jetbrains.compose.web.css.maxHeight
+import org.jetbrains.compose.web.css.maxWidth
 import org.jetbrains.compose.web.css.minHeight
 import org.jetbrains.compose.web.css.minWidth
 import org.jetbrains.compose.web.css.opacity
@@ -87,6 +88,7 @@ object RanstaxStyle : StyleSheet() {
             color(cream)
             roundBorder()
             property("box-shadow", boxShadow)
+            maxWidth(500.px)
         }
         type("button") + attr("disabled") style {
             opacity(0.3)
