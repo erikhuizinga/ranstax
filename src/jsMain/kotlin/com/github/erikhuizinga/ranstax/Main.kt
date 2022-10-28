@@ -50,5 +50,6 @@ private fun storeRanstaxState(ranstaxState: RanstaxState) {
     localStorage[RANSTAX_STATE_KEY] = Json.encodeToString(ranstaxState)
 }
 
-private fun loadRanstaxState(): RanstaxState =
-    localStorage[RANSTAX_STATE_KEY]?.let(Json.Default::decodeFromString) ?: RanstaxState()
+private fun loadRanstaxState() = runCatching<RanstaxState?> {
+    localStorage[RANSTAX_STATE_KEY]?.let(Json.Default::decodeFromString)
+}.onFailure { log(it) }.getOrNull() ?: RanstaxState()
