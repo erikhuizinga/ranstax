@@ -4,9 +4,15 @@ import androidx.compose.runtime.Composable
 import com.github.erikhuizinga.ranstax.data.RanstaxState
 import com.github.erikhuizinga.ranstax.ui.RanstaxStyle
 import kotlinx.browser.document
+import org.jetbrains.compose.web.dom.AttrBuilderContext
+import org.w3c.dom.HTMLDivElement
 
 @Composable
-fun RanstaxApp(ranstaxState: RanstaxState, onNewRanstaxState: (RanstaxState) -> Unit) {
+fun RanstaxApp(
+    attrs: AttrBuilderContext<HTMLDivElement>? = null,
+    ranstaxState: RanstaxState,
+    onNewRanstaxState: (RanstaxState) -> Unit,
+) {
     val stacks = ranstaxState.stacks
 
     document.onkeyup = { event ->
@@ -20,7 +26,10 @@ fun RanstaxApp(ranstaxState: RanstaxState, onNewRanstaxState: (RanstaxState) -> 
         onNewRanstaxState(ranstaxState.copy(isEditing = isEditing))
     }
 
-    Column({ classes(RanstaxStyle.app) }) {
+    Column({
+        classes(RanstaxStyle.app)
+        attrs?.invoke(this)
+    }) {
         Controls(ranstaxState, onNewRanstaxState)
         History(ranstaxState)
         StackList(ranstaxState, onNewRanstaxState, onEditingChange)

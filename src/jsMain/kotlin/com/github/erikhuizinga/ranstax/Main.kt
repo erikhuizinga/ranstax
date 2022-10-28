@@ -36,8 +36,8 @@ fun main() {
         Style(RanstaxStyle)
         var ranstaxState by remember { mutableStateOf(initialRanstaxState) }
         Layout {
-            RanstaxHeader()
-            RanstaxApp(ranstaxState) { newRanstaxState ->
+            RanstaxHeader { classes(RanstaxStyle.header) }
+            RanstaxApp({ classes(RanstaxStyle.mainContent) }, ranstaxState) { newRanstaxState ->
                 storeRanstaxState(newRanstaxState)
                 ranstaxState = newRanstaxState
             }

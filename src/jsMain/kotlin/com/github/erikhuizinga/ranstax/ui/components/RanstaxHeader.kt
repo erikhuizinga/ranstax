@@ -1,13 +1,16 @@
 package com.github.erikhuizinga.ranstax.ui.components
 
 import androidx.compose.runtime.Composable
-import com.github.erikhuizinga.ranstax.ui.RanstaxStyle
+import org.jetbrains.compose.web.dom.AttrBuilderContext
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.Text
+import org.w3c.dom.HTMLDivElement
 
 @Composable
-fun RanstaxHeader() {
-    Div({ classes(RanstaxStyle.header) }) {
+fun RanstaxHeader(
+    attrs: AttrBuilderContext<HTMLDivElement>? = null,
+) {
+    Div({ attrs?.invoke(this) }) {
         Text("Ranstax")
     }
 }

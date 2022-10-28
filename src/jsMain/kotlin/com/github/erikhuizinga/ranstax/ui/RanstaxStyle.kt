@@ -18,6 +18,8 @@ import org.jetbrains.compose.web.css.color
 import org.jetbrains.compose.web.css.display
 import org.jetbrains.compose.web.css.em
 import org.jetbrains.compose.web.css.flexFlow
+import org.jetbrains.compose.web.css.flexGrow
+import org.jetbrains.compose.web.css.flexShrink
 import org.jetbrains.compose.web.css.fontFamily
 import org.jetbrains.compose.web.css.fontSize
 import org.jetbrains.compose.web.css.gap
@@ -78,8 +80,10 @@ object RanstaxStyle : StyleSheet() {
             boxSizing("border-box")
             margin(0.px)
         }
-        "body" style {
+        "html, body, #ranstax" style {
             height(100.percent)
+            margin(0.px)
+            padding(0.px)
             backgroundColor(cream)
             sansSerifFont()
             fontSize(mediumFontSize)
@@ -142,6 +146,7 @@ object RanstaxStyle : StyleSheet() {
             flexWrap = FlexWrap.Nowrap,
         )
         boxSizing("border-box")
+        gap(largeSize)
         height(100.percent)
     }
     val column by style {
@@ -202,13 +207,26 @@ object RanstaxStyle : StyleSheet() {
         fontSize(smallFontSize)
     }
 
+    init {
+        group(className(header), className(footer)) style {
+            flexGrow(0)
+            flexShrink(0)
+        }
+    }
+
+    val mainContent by style {
+        flexGrow(1)
+        paddingTop(0.px)
+        paddingBottom(0.px)
+    }
+
     private fun CSSBuilder.flexListStyle(
         flexDirection: FlexDirection,
         alignItems: AlignItems = AlignItems.Normal,
         flexWrap: FlexWrap = FlexWrap.Wrap,
     ) {
-        flexFlow(flexDirection, flexWrap)
         display(DisplayStyle.Flex)
+        flexFlow(flexDirection, flexWrap)
         alignItems(alignItems)
         gap(rowGap = mediumSize, columnGap = mediumSize)
     }
