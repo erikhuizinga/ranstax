@@ -137,7 +137,7 @@ object RanstaxStyle : StyleSheet() {
     val row by style {
         flexListStyle(
             flexDirection = FlexDirection.Row,
-            alignItems = AlignItems.Center,
+            alignItems = AlignItems.Baseline,
         )
     }
     val header by style {
