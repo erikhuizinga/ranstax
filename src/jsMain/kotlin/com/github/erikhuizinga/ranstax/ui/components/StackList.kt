@@ -3,7 +3,6 @@ package com.github.erikhuizinga.ranstax.ui.components
 import androidx.compose.runtime.Composable
 import com.github.erikhuizinga.ranstax.data.RanstaxState
 import com.github.erikhuizinga.ranstax.ui.RanstaxStyle
-import org.jetbrains.compose.web.css.rowGap
 import org.jetbrains.compose.web.dom.H3
 import org.jetbrains.compose.web.dom.Text
 
@@ -22,7 +21,7 @@ fun StackList(
             Text("📚 Stacks")
         }
         val stacksBeingEdited = ranstaxState.stacksBeingEdited
-        Column({ style { rowGap(RanstaxStyle.smallSize) } }) {
+        Column({ classes(RanstaxStyle.tightColumn) }) {
             stacks.forEach { stack ->
                 if (stack in stacksBeingEdited) {
                     StackEditor(

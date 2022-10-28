@@ -9,6 +9,7 @@ import com.github.erikhuizinga.ranstax.debug.log
 import com.github.erikhuizinga.ranstax.dev.DEV
 import com.github.erikhuizinga.ranstax.dev.setupDevRanstaxState
 import com.github.erikhuizinga.ranstax.ui.RanstaxStyle
+import com.github.erikhuizinga.ranstax.ui.components.Footer
 import com.github.erikhuizinga.ranstax.ui.components.Layout
 import com.github.erikhuizinga.ranstax.ui.components.RanstaxApp
 import com.github.erikhuizinga.ranstax.ui.components.RanstaxHeader
@@ -40,6 +41,7 @@ fun main() {
                 storeRanstaxState(newRanstaxState)
                 ranstaxState = newRanstaxState
             }
+            Footer { classes(RanstaxStyle.footer) }
         }
     }
 }

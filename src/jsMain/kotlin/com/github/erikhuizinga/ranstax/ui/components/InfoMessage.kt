@@ -5,7 +5,7 @@ import com.github.erikhuizinga.ranstax.data.RanstaxState
 
 @Composable
 fun InfoMessage(ranstaxState: RanstaxState) {
-    SmallText(
+    SmallTextSpan(
         when (ranstaxState.hasStacks) {
             true -> when (ranstaxState.areAllStacksEmpty) {
                 true -> "🫥 Nothing left to draw, stacks are empty"

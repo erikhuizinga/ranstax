@@ -38,7 +38,10 @@ import org.jetbrains.compose.web.css.percent
 import org.jetbrains.compose.web.css.pt
 import org.jetbrains.compose.web.css.px
 import org.jetbrains.compose.web.css.rgba
+import org.jetbrains.compose.web.css.rowGap
 import org.jetbrains.compose.web.css.style
+import org.jetbrains.compose.web.css.textAlign
+import org.jetbrains.compose.web.css.textDecoration
 import org.jetbrains.compose.web.css.vh
 import org.jetbrains.compose.web.css.vw
 import org.jetbrains.compose.web.css.width
@@ -57,7 +60,7 @@ object RanstaxStyle : StyleSheet() {
     //endregion
 
     //region Dimensions
-    val smallSize = 2.px
+    private val smallSize = 2.px
     private val mediumSize = 8.px
     private val largeSize = 20.px
 
@@ -102,6 +105,14 @@ object RanstaxStyle : StyleSheet() {
         "h1, h2, h3, h4, h5, h6" style {
             headerFont()
         }
+        "a" style {
+            color(cognac)
+            textDecoration("none")
+        }
+        "a:hover" {
+            color(kellyGreen)
+            textDecoration("underline")
+        }
     }
 
     private fun CSSStyleRuleBuilder.titleFont() {
@@ -136,6 +147,9 @@ object RanstaxStyle : StyleSheet() {
     val column by style {
         flexListStyle(flexDirection = FlexDirection.Column)
     }
+    val tightColumn by style {
+        rowGap(smallSize)
+    }
     val row by style {
         flexListStyle(
             flexDirection = FlexDirection.Row,
@@ -157,6 +171,11 @@ object RanstaxStyle : StyleSheet() {
     val app by style {
         padding(mediumSize)
         gap(largeSize)
+    }
+    val footer by style {
+        rowGap(smallSize)
+        textAlign("center")
+        padding(largeSize)
     }
     val borderRadius by style {
         roundBorder()

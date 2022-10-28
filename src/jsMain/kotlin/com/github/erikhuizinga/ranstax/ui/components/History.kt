@@ -20,7 +20,7 @@ fun History(ranstaxState: RanstaxState) {
             Text("📜 History")
         }
         if (drawnStackNames.isEmpty()) {
-            SmallText("Draw to start history")
+            SmallTextSpan("Draw to start history")
             return@Column
         }
         Div({
