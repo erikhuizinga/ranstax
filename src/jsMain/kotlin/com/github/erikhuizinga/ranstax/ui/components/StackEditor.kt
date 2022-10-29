@@ -9,7 +9,6 @@ import com.github.erikhuizinga.ranstax.data.RanstaxState
 import com.github.erikhuizinga.ranstax.data.Stack
 import com.github.erikhuizinga.ranstax.domain.ExistingStackValidator
 import com.github.erikhuizinga.ranstax.domain.StackValidation
-import com.github.erikhuizinga.ranstax.domain.StackValidation.Valid
 import com.github.erikhuizinga.ranstax.domain.Validator
 import org.jetbrains.compose.web.attributes.disabled
 import org.jetbrains.compose.web.dom.Button
@@ -30,7 +29,7 @@ fun StackEditor(
         val stackValidation = stackValidator(stack)
 
         Button({
-            if (stackValidation == Valid) onClick {
+            if (stackValidation == StackValidation.Valid) onClick {
                 onSave(stack.trimName())
             } else {
                 disabled()
@@ -45,7 +44,7 @@ fun StackEditor(
             stack = stack,
             onInput = { stack = it },
             onSubmit = {
-                if (stackValidation == Valid) {
+                if (stackValidation == StackValidation.Valid) {
                     onSave(stack.trimName())
                 }
             },
