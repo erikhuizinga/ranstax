@@ -1,15 +1,11 @@
 package com.github.erikhuizinga.ranstax.ui.components
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import com.github.erikhuizinga.ranstax.data.RanstaxState
 import com.github.erikhuizinga.ranstax.data.Stack
-import com.github.erikhuizinga.ranstax.debug.log
-import com.github.erikhuizinga.ranstax.domain.NewStackValidatorImpl
 import com.github.erikhuizinga.ranstax.domain.StackValidation
 import com.github.erikhuizinga.ranstax.domain.Validator
 import org.jetbrains.compose.web.attributes.disabled
@@ -21,8 +17,7 @@ import org.jetbrains.compose.web.dom.Text
 fun NewStackInput(
     onNewStack: (newStack: Stack) -> Unit,
     onEditingChange: (isEditing: Boolean) -> Unit,
-    ranstaxState: RanstaxState,
-    stackValidator: Validator<Stack, StackValidation> = NewStackValidatorImpl(ranstaxState),
+    stackValidator: Validator<Stack, StackValidation>,
 ) {
     Column {
         H3 {
@@ -33,27 +28,19 @@ fun NewStackInput(
             val defaultSize = 10
             var name by remember { mutableStateOf(defaultName) }
             var size by remember { mutableStateOf(defaultSize) }
-
             val stack = Stack(name, size)
-            val stackValidation = stackValidator(stack)
-            log("NewStackInput: stackValidation = $stackValidation")
-
-            val hintOrNull by remember(ranstaxState.isEditing, stackValidation) {
-                derivedStateOf {
-                    log("Evaluating hint or null")
-                    stackValidation
-                        .takeIf { it != StackValidation.NameBlank || ranstaxState.isEditing }
-                        ?.hint
-                }
-            }
-            log("NewStackInput: ranstaxState.isEditing = ${ranstaxState.isEditing}")
-            log("NewStackInput: hintOrNull = $hintOrNull")
 
             fun onNewStackAndResetState() {
                 onNewStack(stack.trimName())
                 name = defaultName
                 size = defaultSize
             }
+
+            val stackValidation = stackValidator(stack)
+            var isEditing by remember { mutableStateOf(false) }
+            val hintOrNull = stackValidation
+                .takeIf { it != StackValidation.NameBlank || isEditing }
+                ?.hint
 
             StackInput(
                 stack = stack,
@@ -66,7 +53,10 @@ fun NewStackInput(
                         onNewStackAndResetState()
                     }
                 },
-                onEditingChange = onEditingChange,
+                onEditingChange = { newIsEditing ->
+                    isEditing = newIsEditing
+                    onEditingChange(newIsEditing)
+                },
             )
             Button({
                 if (stackValidation == StackValidation.Valid) onClick {
