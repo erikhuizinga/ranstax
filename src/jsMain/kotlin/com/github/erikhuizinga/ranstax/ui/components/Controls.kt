@@ -8,10 +8,10 @@ import kotlin.random.Random
 @Composable
 fun Controls(
     ranstaxState: RanstaxState,
-    onNewRanstaxState: (RanstaxState) -> Unit,
+    onNewRanstaxStateTransform: (RanstaxState.() -> RanstaxState) -> Unit,
 ) {
     Column {
-        DrawButtons(ranstaxState) { number -> onDraw(number, ranstaxState, onNewRanstaxState) }
+        DrawButtons(ranstaxState) { number -> onDraw(number, ranstaxState, onNewRanstaxStateTransform) }
         InfoMessage(ranstaxState)
     }
 }
@@ -19,7 +19,7 @@ fun Controls(
 fun onDraw(
     numToDraw: Int,
     ranstaxState: RanstaxState,
-    onNewRanstaxState: (RanstaxState) -> Unit,
+    onNewRanstaxStateTransform: (RanstaxState.() -> RanstaxState) -> Unit,
 ) {
     var newRanstaxState = ranstaxState
     val theNumToDraw = min(numToDraw, ranstaxState.totalStackSize)
@@ -45,5 +45,5 @@ fun onDraw(
     newRanstaxState = newRanstaxState.copy(
         drawnStackNames = newRanstaxState.drawnStackNames + listOf(drawnStackNames)
     )
-    onNewRanstaxState(newRanstaxState)
+    onNewRanstaxStateTransform { newRanstaxState }
 }

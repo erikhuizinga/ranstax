@@ -9,7 +9,7 @@ import org.jetbrains.compose.web.dom.Text
 @Composable
 fun StackList(
     ranstaxState: RanstaxState,
-    onNewRanstaxState: (RanstaxState) -> Unit,
+    onNewRanstaxStateTransform: (RanstaxState.() -> RanstaxState) -> Unit,
     onEditingChange: (isEditing: Boolean) -> Unit,
 ) {
     val stacks = ranstaxState.stacks
@@ -27,29 +27,29 @@ fun StackList(
                     StackEditor(
                         currentStack = stack,
                         onSave = { savedStack ->
-                            onNewRanstaxState(
-                                ranstaxState.copy(
+                            onNewRanstaxStateTransform {
+                                copy(
                                     stacks = stacks.map { if (it == stack) savedStack else it },
                                     stacksBeingEdited = stacksBeingEdited - stack,
                                 )
-                            )
+                            }
                         },
                         onDelete = {
-                            onNewRanstaxState(
-                                ranstaxState.copy(
+                            onNewRanstaxStateTransform {
+                                copy(
                                     stacks = stacks - stack,
                                     stacksBeingEdited = stacksBeingEdited - stack,
                                 )
-                            )
+                            }
                         },
                         onEditingChange = onEditingChange,
                         ranstaxState = ranstaxState,
                     )
                 } else {
                     EditableStack(stack) {
-                        onNewRanstaxState(
-                            ranstaxState.copy(stacksBeingEdited = stacksBeingEdited + stack)
-                        )
+                        onNewRanstaxStateTransform {
+                            copy(stacksBeingEdited = stacksBeingEdited + stack)
+                        }
                     }
                 }
             }

@@ -35,12 +35,18 @@ fun main() {
     renderComposable(rootElementId = "ranstax") {
         Style(RanstaxStyle)
         var ranstaxState by remember { mutableStateOf(initialRanstaxState) }
+        val onNewRanstaxStateTransform: (RanstaxState.() -> RanstaxState) -> Unit = { transform ->
+            val newRanstaxState = ranstaxState.transform()
+            storeRanstaxState(newRanstaxState)
+            ranstaxState = newRanstaxState
+        }
         Layout {
             RanstaxHeader { classes(RanstaxStyle.header) }
-            RanstaxApp({ classes(RanstaxStyle.mainContent) }, ranstaxState) { newRanstaxState ->
-                storeRanstaxState(newRanstaxState)
-                ranstaxState = newRanstaxState
-            }
+            RanstaxApp(
+                { classes(RanstaxStyle.mainContent) },
+                ranstaxState,
+                onNewRanstaxStateTransform,
+            )
             Footer { classes(RanstaxStyle.footer) }
         }
     }
