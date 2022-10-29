@@ -11,18 +11,20 @@ fun Controls(
     onNewRanstaxStateTransform: (RanstaxState.() -> RanstaxState) -> Unit,
 ) {
     Column {
-        DrawButtons(ranstaxState) { number -> onDraw(number, ranstaxState, onNewRanstaxStateTransform) }
+        DrawButtons(ranstaxState.isDrawButtonEnabled) { numberToDraw ->
+            onDraw(numberToDraw, ranstaxState, onNewRanstaxStateTransform)
+        }
         InfoMessage(ranstaxState)
     }
 }
 
 fun onDraw(
-    numToDraw: Int,
+    numberToDraw: Int,
     ranstaxState: RanstaxState,
     onNewRanstaxStateTransform: (RanstaxState.() -> RanstaxState) -> Unit,
 ) {
     var newRanstaxState = ranstaxState
-    val theNumToDraw = min(numToDraw, ranstaxState.totalStackSize)
+    val theNumToDraw = min(numberToDraw, ranstaxState.totalStackSize)
     val drawnStackNames = mutableListOf<String>()
     repeat(theNumToDraw) {
         var chosenIndex = Random.nextInt(newRanstaxState.totalStackSize)

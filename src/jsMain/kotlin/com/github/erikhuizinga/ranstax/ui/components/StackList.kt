@@ -2,6 +2,8 @@ package com.github.erikhuizinga.ranstax.ui.components
 
 import androidx.compose.runtime.Composable
 import com.github.erikhuizinga.ranstax.data.RanstaxState
+import com.github.erikhuizinga.ranstax.domain.ExistingStackValidator
+import com.github.erikhuizinga.ranstax.domain.NewStackValidatorImpl
 import com.github.erikhuizinga.ranstax.ui.RanstaxStyle
 import org.jetbrains.compose.web.dom.H3
 import org.jetbrains.compose.web.dom.Text
@@ -43,7 +45,10 @@ fun StackList(
                             }
                         },
                         onEditingChange = onEditingChange,
-                        ranstaxState = ranstaxState,
+                        stackValidator = ExistingStackValidator(
+                            stack,
+                            NewStackValidatorImpl(ranstaxState),
+                        )
                     )
                 } else {
                     EditableStack(stack) {

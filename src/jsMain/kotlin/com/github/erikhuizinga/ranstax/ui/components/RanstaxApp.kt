@@ -35,9 +35,7 @@ fun RanstaxApp(
         History(ranstaxState)
         StackList(ranstaxState, onNewRanstaxStateTransform, onEditingChange)
         NewStackInput(
-            onNewStack = {
-                onNewRanstaxStateTransform { copy(stacks = stacks + it) }
-            },
+            onNewStack = { onNewRanstaxStateTransform { copy(stacks = stacks + it) } },
             onEditingChange = onEditingChange,
             stackValidator = NewStackValidatorImpl(ranstaxState),
         )

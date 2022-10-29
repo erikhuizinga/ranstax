@@ -5,9 +5,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import com.github.erikhuizinga.ranstax.data.RanstaxState
 import com.github.erikhuizinga.ranstax.data.Stack
-import com.github.erikhuizinga.ranstax.domain.ExistingStackValidator
 import com.github.erikhuizinga.ranstax.domain.StackValidation
 import com.github.erikhuizinga.ranstax.domain.Validator
 import org.jetbrains.compose.web.attributes.disabled
@@ -20,9 +18,7 @@ fun StackEditor(
     onSave: (savedStack: Stack) -> Unit,
     onDelete: () -> Unit,
     onEditingChange: (isEditing: Boolean) -> Unit,
-    ranstaxState: RanstaxState,
-    stackValidator: Validator<Stack, StackValidation> =
-        ExistingStackValidator(ranstaxState, currentStack),
+    stackValidator: Validator<Stack, StackValidation>,
 ) {
     Row {
         var stack by remember { mutableStateOf(currentStack) }
