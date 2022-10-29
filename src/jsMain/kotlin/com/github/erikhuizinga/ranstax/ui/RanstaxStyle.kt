@@ -130,7 +130,7 @@ object RanstaxStyle : StyleSheet() {
         type("button") + attr("disabled") style {
             opacity(0.3)
         }
-        "button:hover" style {
+        "button:hover:enabled" style {
             backgroundColor(buttonHoverColor.value(cognacDark1))
         }
         "input" style {
