@@ -11,7 +11,7 @@ fun Controls(
     onNewRanstaxState: (RanstaxState) -> Unit,
 ) {
     Column {
-        DrawButton(ranstaxState) { onDraw(1, ranstaxState, onNewRanstaxState) }
+        DrawButtons(ranstaxState) { number -> onDraw(number, ranstaxState, onNewRanstaxState) }
         InfoMessage(ranstaxState)
     }
 }

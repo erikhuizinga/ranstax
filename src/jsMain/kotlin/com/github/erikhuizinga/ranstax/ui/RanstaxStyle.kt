@@ -1,7 +1,9 @@
 package com.github.erikhuizinga.ranstax.ui
 
+import kotlin.math.roundToInt
 import org.jetbrains.compose.web.css.AlignItems
 import org.jetbrains.compose.web.css.CSSBuilder
+import org.jetbrains.compose.web.css.CSSColorValue
 import org.jetbrains.compose.web.css.CSSStyleRuleBuilder
 import org.jetbrains.compose.web.css.Color
 import org.jetbrains.compose.web.css.DisplayStyle
@@ -24,6 +26,7 @@ import org.jetbrains.compose.web.css.flexShrink
 import org.jetbrains.compose.web.css.fontFamily
 import org.jetbrains.compose.web.css.fontSize
 import org.jetbrains.compose.web.css.gap
+import org.jetbrains.compose.web.css.gridTemplateColumns
 import org.jetbrains.compose.web.css.height
 import org.jetbrains.compose.web.css.margin
 import org.jetbrains.compose.web.css.maxHeight
@@ -38,22 +41,51 @@ import org.jetbrains.compose.web.css.paddingRight
 import org.jetbrains.compose.web.css.paddingTop
 import org.jetbrains.compose.web.css.percent
 import org.jetbrains.compose.web.css.px
+import org.jetbrains.compose.web.css.rgb
 import org.jetbrains.compose.web.css.rgba
 import org.jetbrains.compose.web.css.rowGap
 import org.jetbrains.compose.web.css.style
 import org.jetbrains.compose.web.css.textAlign
 import org.jetbrains.compose.web.css.textDecoration
 import org.jetbrains.compose.web.css.times
+import org.jetbrains.compose.web.css.value
+import org.jetbrains.compose.web.css.variable
 import org.jetbrains.compose.web.css.vh
 import org.jetbrains.compose.web.css.width
 
+private typealias RGBTriple = Triple<Int, Int, Int>
 
 object RanstaxStyle : StyleSheet() {
+    //region colors
+    private val RGBTriple.color get() = rgb(first, second, third)
+
+    private fun RGBTriple.map(transform: (Int) -> Int) =
+        RGBTriple(transform(first), transform(second), transform(third))
+
+    private val RGBTriple.darker get() = map { (it / 1.2).roundToInt() }
+
     //region Theme colors: https://www.canva.com/colors/color-palettes/random-market-finds/
     private val cream = Color("#F6F4E7")
     private val gray = Color("#7C847F")
-    private val cognac = Color("#937965")
+    private val cognac: CSSColorValue
     private val kellyGreen = Color("#69914D")
+    //endregion
+
+    private val cognacDark0: CSSColorValue
+    private val cognacDark1: CSSColorValue
+    private val cognacDark2: CSSColorValue
+
+    init {
+        val cognacRGBTriple = RGBTriple(147, 121, 101)
+        cognac = cognacRGBTriple.color
+        val cognacDark0Triple = cognacRGBTriple.darker
+        cognacDark0 = cognacDark0Triple.color
+        val cognacDark1Triple = cognacDark0Triple.darker
+        cognacDark1 = cognacDark1Triple.color
+        cognacDark2 = cognacDark1Triple.darker.color
+    }
+
+    private val buttonHoverColor by variable<CSSColorValue>()
     //endregion
 
     //region More colors
@@ -97,6 +129,9 @@ object RanstaxStyle : StyleSheet() {
         }
         type("button") + attr("disabled") style {
             opacity(0.3)
+        }
+        "button:hover" style {
+            backgroundColor(buttonHoverColor.value(cognacDark1))
         }
         "input" style {
             backgroundColor(cream)
@@ -200,6 +235,18 @@ object RanstaxStyle : StyleSheet() {
     val mediumButton by style {
         padding(mediumSize)
         fontSize(mediumFontSize)
+    }
+    val numberButtonGrid by style {
+        display(DisplayStyle.Grid)
+        gridTemplateColumns("1fr 1fr 1fr")
+        gap(mediumSize)
+    }
+    val numberButton0 by style {
+        backgroundColor(cognacDark0)
+        buttonHoverColor(cognacDark2)
+    }
+    val numberButton1 by style {
+        backgroundColor(cognac)
     }
     val smallFont by style {
         fontSize(smallFontSize)
