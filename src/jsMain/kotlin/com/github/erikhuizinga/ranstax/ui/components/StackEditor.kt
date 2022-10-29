@@ -22,7 +22,8 @@ fun StackEditor(
     onDelete: () -> Unit,
     onEditingChange: (isEditing: Boolean) -> Unit,
     ranstaxState: RanstaxState,
-    stackValidator: Validator<Stack, StackValidation> = ExistingStackValidator(ranstaxState),
+    stackValidator: Validator<Stack, StackValidation> =
+        ExistingStackValidator(ranstaxState, currentStack),
 ) {
     Row {
         var stack by remember { mutableStateOf(currentStack) }

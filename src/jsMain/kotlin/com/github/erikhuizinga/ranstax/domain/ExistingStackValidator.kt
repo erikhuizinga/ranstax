@@ -5,10 +5,16 @@ import com.github.erikhuizinga.ranstax.data.Stack
 
 class ExistingStackValidator(
     private val ranstaxState: RanstaxState,
+    private val stackBeingEdited: Stack,
     private val newStackValidator: NewStackValidator = NewStackValidatorImpl(ranstaxState),
 ) : Validator<Stack, StackValidation> {
     override operator fun invoke(obj: Stack) = when (val stackValidation = newStackValidator(obj)) {
-        StackValidation.NameExists -> StackValidation.Valid
+        StackValidation.NameExists -> if (obj.name == stackBeingEdited.name) {
+            StackValidation.Valid
+        } else {
+            StackValidation.NameExists
+        }
+
         else -> stackValidation
     }
 }

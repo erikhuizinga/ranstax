@@ -25,15 +25,19 @@ class ExistingStackValidatorTest {
 
     @Test
     fun givenANewStackValidatorThatDoesNotReturnNameExists_WhenValidated_ThenItReturnsTheValidation() {
+        val stack = Stack("name", 1)
         StackValidation
             .values()
             .filterNot { it == StackValidation.NameExists }
             .forEach { expectedStackValidation ->
                 val newStackValidator = createFakeNewStackValidator(expectedStackValidation)
-                val existingStackValidator =
-                    ExistingStackValidator(RanstaxState(), newStackValidator)
+                val existingStackValidator = ExistingStackValidator(
+                    RanstaxState(),
+                    stack,
+                    newStackValidator,
+                )
 
-                val actual = existingStackValidator(Stack("name", 1))
+                val actual = existingStackValidator(stack)
 
                 assertEquals(
                     expectedStackValidation,
@@ -48,14 +52,42 @@ class ExistingStackValidatorTest {
     }
 
     @Test
-    fun givenANewStackValidatorThatReturnsNameExists_WhenValidated_ThenItReturnsValid() {
+    fun givenANewStackValidatorThatReturnsNameExistsForThisStack_WhenValidated_ThenItReturnsValid() {
+        val thisStack = Stack("name", 1)
         val newStackValidator = createFakeNewStackValidator(StackValidation.NameExists)
-        val existingStackValidator = ExistingStackValidator(RanstaxState(), newStackValidator)
+        val existingStackValidator = ExistingStackValidator(
+            RanstaxState(),
+            thisStack,
+            newStackValidator,
+        )
 
-        val actual = existingStackValidator(Stack("name", 1))
+        val actual = existingStackValidator(thisStack)
 
         assertEquals(
             StackValidation.Valid,
+            actual
+        )
+        assertEquals(
+            1,
+            fakeCalls
+        )
+    }
+
+    @Test
+    fun givenANewStackValidatorThatReturnsNameExistsForAnotherStack_WhenValidated_ThenItReturnsNameExists() {
+        val thisStack = Stack("name", 1)
+        val anotherStack = Stack("another", 1)
+        val newStackValidator = createFakeNewStackValidator(StackValidation.NameExists)
+        val existingStackValidator = ExistingStackValidator(
+            RanstaxState(),
+            thisStack,
+            newStackValidator,
+        )
+
+        val actual = existingStackValidator(anotherStack)
+
+        assertEquals(
+            StackValidation.NameExists,
             actual
         )
         assertEquals(
