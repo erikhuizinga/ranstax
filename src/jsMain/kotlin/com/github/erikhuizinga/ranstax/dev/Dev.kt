@@ -9,13 +9,14 @@ val DEV = URLSearchParams(document.location?.search).get("dev").toBoolean()
 
 fun setupDevRanstaxState(ranstaxState: RanstaxState) =
     if (ranstaxState.totalStackSize == 0) {
-        val northAmericaStack = Stack("💙 North America", 180)
-        val europeStack = Stack("💜 Europe", 81)
-        val oceaniaStack = Stack("💛 Oceania", 95)
-        val asiaStack = Stack("❤️ Asia", 90)
-        val stacks = listOf(northAmericaStack, europeStack, oceaniaStack, asiaStack)
-        val stacksBeingEdited: List<Stack> = listOf(/* northAmericaStack */)
-        RanstaxState(stacks, stacksBeingEdited)
+        RanstaxState(
+            listOf(
+                Stack("💙 North America", 180),
+                Stack("💜 Europe", 81),
+                Stack("💛 Oceania", 95),
+                Stack("❤️ Asia", 90),
+            ).associateWith { false }
+        )
     } else {
         ranstaxState
     }

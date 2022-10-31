@@ -54,10 +54,12 @@ fun main() {
 
 private const val RANSTAX_STATE_KEY = "RanstaxState"
 
+private val json = Json { allowStructuredMapKeys = true }
+
 private fun storeRanstaxState(ranstaxState: RanstaxState) {
-    localStorage[RANSTAX_STATE_KEY] = Json.encodeToString(ranstaxState)
+    localStorage[RANSTAX_STATE_KEY] = json.encodeToString(ranstaxState)
 }
 
 private fun loadRanstaxState() = runCatching<RanstaxState?> {
-    localStorage[RANSTAX_STATE_KEY]?.let(Json.Default::decodeFromString)
+    localStorage[RANSTAX_STATE_KEY]?.let { json.decodeFromString(it) }
 }.onFailure { log(it) }.getOrNull() ?: RanstaxState()

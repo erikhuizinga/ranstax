@@ -14,8 +14,7 @@ fun StackList(
     onNewRanstaxStateTransform: (RanstaxState.() -> RanstaxState) -> Unit,
     onEditingChange: (isEditing: Boolean) -> Unit,
 ) {
-    val stacks = ranstaxState.stacks
-    if (stacks.isEmpty()) {
+    if (ranstaxState.allStacks.isEmpty()) {
         return
     }
     Column {
@@ -24,36 +23,36 @@ fun StackList(
         }
         val stacksBeingEdited = ranstaxState.stacksBeingEdited
         Column({ classes(RanstaxStyle.tightColumn) }) {
-            stacks.forEach { stack ->
-                if (stack in stacksBeingEdited) {
+            ranstaxState.allStacks.forEach { (stackToRender, isBeingEdited) ->
+                if (isBeingEdited) {
                     StackEditor(
-                        currentStack = stack,
+                        currentStack = stackToRender,
                         onSave = { savedStack ->
                             onNewRanstaxStateTransform {
                                 copy(
-                                    stacks = stacks.map { if (it == stack) savedStack else it },
-                                    stacksBeingEdited = stacksBeingEdited - stack,
+                                    allStacks = allStacks
+                                        .mapValues { if (it.key == stackToRender) false else it.value }
+                                        .mapKeys { if (it.key == stackToRender) savedStack else it.key },
                                 )
                             }
                         },
                         onDelete = {
-                            onNewRanstaxStateTransform {
-                                copy(
-                                    stacks = stacks - stack,
-                                    stacksBeingEdited = stacksBeingEdited - stack,
-                                )
-                            }
+                            onNewRanstaxStateTransform { copy(allStacks = allStacks - stackToRender) }
                         },
                         onEditingChange = onEditingChange,
                         stackValidator = ExistingStackValidator(
-                            stack,
+                            stackToRender,
                             NewStackValidatorImpl(ranstaxState),
                         )
                     )
                 } else {
-                    EditableStack(stack) {
+                    EditableStack(stackToRender) {
                         onNewRanstaxStateTransform {
-                            copy(stacksBeingEdited = stacksBeingEdited + stack)
+                            copy(
+                                allStacks = allStacks.mapValues { entry ->
+                                    if (entry.key == stackToRender) true else entry.value
+                                }
+                            )
                         }
                     }
                 }

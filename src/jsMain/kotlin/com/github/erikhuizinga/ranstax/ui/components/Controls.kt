@@ -34,11 +34,11 @@ fun onDraw(
             chosenIndex < 0
         }
         newRanstaxState = newRanstaxState.copy(
-            stacks = stacks.map {
-                if (it == chosenStack) {
+            allStacks = newRanstaxState.allStacks.mapKeys { (stack, _) ->
+                if (stack == chosenStack) {
                     chosenStack.copy(size = chosenStack.size - 1)
                 } else {
-                    it
+                    stack
                 }
             },
         )
