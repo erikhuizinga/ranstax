@@ -1,6 +1,5 @@
 package com.github.erikhuizinga.ranstax.domain
 
-import com.github.erikhuizinga.ranstax.data.RanstaxState
 import com.github.erikhuizinga.ranstax.data.Stack
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -31,11 +30,7 @@ class ExistingStackValidatorTest {
             .filterNot { it == StackValidation.NameExists }
             .forEach { expectedStackValidation ->
                 val newStackValidator = createFakeNewStackValidator(expectedStackValidation)
-                val existingStackValidator = ExistingStackValidator(
-                    RanstaxState(),
-                    stack,
-                    newStackValidator,
-                )
+                val existingStackValidator = ExistingStackValidator(stack, newStackValidator)
 
                 val actual = existingStackValidator(stack)
 
@@ -55,11 +50,7 @@ class ExistingStackValidatorTest {
     fun givenANewStackValidatorThatReturnsNameExistsForThisStack_WhenValidated_ThenItReturnsValid() {
         val thisStack = Stack("name", 1)
         val newStackValidator = createFakeNewStackValidator(StackValidation.NameExists)
-        val existingStackValidator = ExistingStackValidator(
-            RanstaxState(),
-            thisStack,
-            newStackValidator,
-        )
+        val existingStackValidator = ExistingStackValidator(thisStack, newStackValidator)
 
         val actual = existingStackValidator(thisStack)
 
@@ -78,11 +69,7 @@ class ExistingStackValidatorTest {
         val thisStack = Stack("name", 1)
         val anotherStack = Stack("another", 1)
         val newStackValidator = createFakeNewStackValidator(StackValidation.NameExists)
-        val existingStackValidator = ExistingStackValidator(
-            RanstaxState(),
-            thisStack,
-            newStackValidator,
-        )
+        val existingStackValidator = ExistingStackValidator(thisStack, newStackValidator)
 
         val actual = existingStackValidator(anotherStack)
 

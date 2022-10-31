@@ -39,40 +39,11 @@ class NewStackValidatorImplTest {
         )
     }
 
-//    @Test
-//    fun givenANotNewStackWithExistingName_WhenValidated_ThenExistingName() {
-//        val stack0 = Stack(name = "name0", size = 1)
-//        val stack1 = Stack(name = "name1", size = 2)
-//        val ranstaxState = RanstaxState(
-//            stacks = listOf(stack0, stack1),
-//            stacksBeingEdited = listOf(stack0),
-//        )
-//        val stackValidator = NewStackValidator(ranstaxState)
-//        val stack2 = stack0.copy(name = stack1.name)
-//
-//        assertEquals(
-//            StackValidation.ExistingName,
-//            stackValidator(stack2)
-//        )
-//    }
-
-//    @Test
-//    fun givenAValidStackThatIsNotNew_WhenValidated_ThenValid() {
-//        val stack = Stack(name = "name", size = 1)
-//        val ranstaxState = RanstaxState(stacks = listOf(stack), stacksBeingEdited = listOf(stack))
-//        val stackValidator = NewStackValidator(ranstaxState)
-//
-//        assertEquals(
-//            StackValidation.Valid,
-//            stackValidator(stack)
-//        )
-//    }
-
     @Test
     fun givenAValidStackThatExists_WhenValidated_ThenNameExistsIsReturned() {
         val stack0 = Stack("name", size = 1)
         val stack1 = Stack(" name ", size = 1)
-        val ranstaxState = RanstaxState(stacks = listOf(stack0, stack1))
+        val ranstaxState = RanstaxState(allStacks = listOf(stack0, stack1).associateWith { false })
         val stackValidator = NewStackValidatorImpl(ranstaxState)
 
         assertEquals(
@@ -118,7 +89,7 @@ class NewStackValidatorImplTest {
         val name = "name"
         val paddedName = " name "
         val existingStack = Stack(name, 1)
-        val ranstaxState = RanstaxState(stacks = listOf(existingStack))
+        val ranstaxState = RanstaxState(allStacks = mapOf(existingStack to false))
         val newStackValidator = NewStackValidatorImpl(ranstaxState)
         val newStack = Stack(paddedName, 1)
 
@@ -137,10 +108,7 @@ class NewStackValidatorImplTest {
         val name = "name"
         val paddedName = " name "
         val stack0 = Stack(name, 1)
-        val ranstaxState = RanstaxState(
-            stacks = listOf(stack0),
-            stacksBeingEdited = listOf(stack0),
-        )
+        val ranstaxState = RanstaxState(allStacks = mapOf(stack0 to true))
         val existingNameValidator = NewStackValidatorImpl(ranstaxState)
         val stack1 = Stack(paddedName, 1)
 
