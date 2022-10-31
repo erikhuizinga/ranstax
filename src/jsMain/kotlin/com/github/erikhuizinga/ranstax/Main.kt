@@ -25,12 +25,8 @@ import org.w3c.dom.set
 fun main() {
     log("Debugging enabled")
 
-    val initialRanstaxState = if (DEV) {
-        log("Setting up dev stacks")
-        setupDevRanstaxState(loadRanstaxState())
-    } else {
-        loadRanstaxState()
-    }
+    val initialRanstaxState = loadRanstaxState()
+        .let { if (DEV) setupDevRanstaxState(it) else it }
 
     renderComposable(rootElementId = "ranstax") {
         Style(RanstaxStyle)
