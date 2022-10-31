@@ -3,7 +3,6 @@ package com.github.erikhuizinga.ranstax.ui.components
 import androidx.compose.runtime.Composable
 import androidx.compose.web.events.SyntheticEvent
 import com.github.erikhuizinga.ranstax.data.Stack
-import com.github.erikhuizinga.ranstax.debug.log
 import org.jetbrains.compose.web.attributes.placeholder
 import org.jetbrains.compose.web.attributes.size
 import org.jetbrains.compose.web.dom.NumberInput
@@ -20,7 +19,6 @@ fun StackInput(
 ) {
     val submitListener: (SyntheticEvent<EventTarget>) -> Unit = { event ->
         (event.nativeEvent as? KeyboardEvent)?.takeIf { it.key == "Enter" }?.let {
-            log("Calling onSubit after Enter press")
             onSubmit()
             it.preventDefault()
         }
