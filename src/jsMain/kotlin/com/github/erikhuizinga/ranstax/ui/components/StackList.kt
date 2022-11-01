@@ -46,7 +46,7 @@ fun StackList(
                         )
                     )
                 } else {
-                    EditableStack(stackToRender) {
+                    EditableStackNameAndSize(stackToRender) {
                         onNewRanstaxStateTransform {
                             copy(
                                 allStacks = allStacks.mapValues { entry ->

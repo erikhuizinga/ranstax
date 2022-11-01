@@ -6,7 +6,7 @@ import org.jetbrains.compose.web.dom.Button
 import org.jetbrains.compose.web.dom.Text
 
 @Composable
-fun EditableStack(
+fun EditableStackNameAndSize(
     stack: Stack,
     onEdit: () -> Unit,
 ) {
