@@ -27,8 +27,6 @@ class NewStackValidatorImpl(
             ) {
                 return false
             }
-
-            val stacks = ranstaxState.stacks
-            return stacks.isNotEmpty() && stacks.any { trimmedName == it.name }
+            return ranstaxState.hasStacks && ranstaxState.stacks.any { trimmedName == it.name }
         }
 }

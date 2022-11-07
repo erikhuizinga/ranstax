@@ -28,7 +28,7 @@ fun NewStackInput(
             val defaultSize = 10
             var name by remember { mutableStateOf(defaultName) }
             var size by remember { mutableStateOf(defaultSize) }
-            val stack = Stack(name, size)
+            val stack = Stack(name = name, size = size)
 
             fun onNewStackAndResetState() {
                 onNewStack(stack.trimName())

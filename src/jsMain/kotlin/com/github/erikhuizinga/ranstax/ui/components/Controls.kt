@@ -11,7 +11,7 @@ fun Controls(
     onNewRanstaxStateTransform: (RanstaxState.() -> RanstaxState) -> Unit,
 ) {
     Column {
-        DrawButtons(ranstaxState.isDrawButtonEnabled) { numberToDraw ->
+        DrawButtons(ranstaxState.canDraw) { numberToDraw ->
             onDraw(numberToDraw, ranstaxState, onNewRanstaxStateTransform)
         }
         InfoMessage(ranstaxState)
@@ -26,23 +26,15 @@ fun onDraw(
     var newRanstaxState = ranstaxState
     val theNumToDraw = min(numberToDraw, ranstaxState.totalStackSize)
     val drawnStackNames = mutableListOf<String>()
+
     repeat(theNumToDraw) {
         var chosenIndex = Random.nextInt(newRanstaxState.totalStackSize)
-        val stacks = newRanstaxState.stacks
-        val chosenStack = stacks.first {
-            chosenIndex -= it.size
+        val (drawnId, drawnStack) = newRanstaxState.stateStacks.first {
+            chosenIndex -= it.stack.size
             chosenIndex < 0
         }
-        newRanstaxState = newRanstaxState.copy(
-            allStacks = newRanstaxState.allStacks.mapKeys { (stack, _) ->
-                if (stack == chosenStack) {
-                    chosenStack.copy(size = chosenStack.size - 1)
-                } else {
-                    stack
-                }
-            },
-        )
-        drawnStackNames += chosenStack.name
+        newRanstaxState = newRanstaxState.replace(drawnId, drawnStack.run { copy(size = size - 1) })
+        drawnStackNames += drawnStack.name
     }
     newRanstaxState = newRanstaxState.copy(
         drawnStackNames = newRanstaxState.drawnStackNames + listOf(drawnStackNames)

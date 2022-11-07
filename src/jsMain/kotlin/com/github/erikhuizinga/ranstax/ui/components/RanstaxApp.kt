@@ -14,17 +14,15 @@ fun RanstaxApp(
     ranstaxState: RanstaxState,
     onNewRanstaxStateTransform: (RanstaxState.() -> RanstaxState) -> Unit,
 ) {
-    val stacks = ranstaxState.stacks
-
     document.onkeyup = { event ->
-        if (!ranstaxState.isEditing && ranstaxState.isDrawButtonEnabled && event.key in "1".."9") {
+        if (!ranstaxState.isEditing && ranstaxState.canDraw && event.key in "1".."9") {
             onDraw(event.key.toInt(), ranstaxState, onNewRanstaxStateTransform)
             event.preventDefault()
         }
     }
 
-    val onEditingChange = { isEditing: Boolean ->
-        onNewRanstaxStateTransform { copy(isEditing = isEditing) }
+    val onEditingChange = { newIsEditing: Boolean ->
+        onNewRanstaxStateTransform { copy(isEditing = newIsEditing) }
     }
 
     Column({
@@ -35,9 +33,7 @@ fun RanstaxApp(
         History(ranstaxState)
         StackList(ranstaxState, onNewRanstaxStateTransform, onEditingChange)
         NewStackInput(
-            onNewStack = {
-                onNewRanstaxStateTransform { copy(allStacks = allStacks + (it to false)) }
-            },
+            onNewStack = { newStack -> onNewRanstaxStateTransform { this + newStack } },
             onEditingChange = onEditingChange,
             stackValidator = NewStackValidatorImpl(ranstaxState),
         )

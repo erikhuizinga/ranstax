@@ -2,6 +2,7 @@ package com.github.erikhuizinga.ranstax.domain
 
 import com.github.erikhuizinga.ranstax.data.RanstaxState
 import com.github.erikhuizinga.ranstax.data.Stack
+import com.github.erikhuizinga.ranstax.data.StateStack
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -41,9 +42,12 @@ class NewStackValidatorImplTest {
 
     @Test
     fun givenAValidStackThatExists_WhenValidated_ThenNameExistsIsReturned() {
-        val stack0 = Stack("name", size = 1)
-        val stack1 = Stack(" name ", size = 1)
-        val ranstaxState = RanstaxState(allStacks = listOf(stack0, stack1).associateWith { false })
+        val stack0 = Stack(name = "name", size = 1)
+        val stack1 = Stack(name = " name ", size = 1)
+        val stateStacks = listOf(stack0, stack1).mapIndexed { index, stack ->
+            StateStack(index, stack)
+        }
+        val ranstaxState = RanstaxState(stateStacks = stateStacks)
         val stackValidator = NewStackValidatorImpl(ranstaxState)
 
         assertEquals(
@@ -58,7 +62,7 @@ class NewStackValidatorImplTest {
 
     @Test
     fun givenAValidStackThatDoesNotExists_WhenValidated_ThenValidIsReturned() {
-        val stack = Stack("name", size = 1)
+        val stack = Stack(name = "name", size = 1)
         val stackValidator = NewStackValidatorImpl(RanstaxState())
 
         assertEquals(
@@ -88,10 +92,10 @@ class NewStackValidatorImplTest {
     fun givenExistingNameWithOptionalBlankPaddingNotBeingEdited_WhenValidated_ThenNameExistsIsReturned() {
         val name = "name"
         val paddedName = " name "
-        val existingStack = Stack(name, 1)
-        val ranstaxState = RanstaxState(allStacks = mapOf(existingStack to false))
+        val existingStack = Stack(name = name, size = 1)
+        val ranstaxState = RanstaxState(stateStacks = listOf(StateStack(0, existingStack)))
         val newStackValidator = NewStackValidatorImpl(ranstaxState)
-        val newStack = Stack(paddedName, 1)
+        val newStack = Stack(name = paddedName, size = 1)
 
         assertEquals(
             StackValidation.NameExists,
@@ -107,10 +111,10 @@ class NewStackValidatorImplTest {
     fun givenExistingNameWithOptionalBlankPaddingBeingEdited_WhenValidated_ThenValidIsReturned() {
         val name = "name"
         val paddedName = " name "
-        val stack0 = Stack(name, 1)
-        val ranstaxState = RanstaxState(allStacks = mapOf(stack0 to true))
+        val stack0 = Stack(name = name, size = 1)
+        val ranstaxState = RanstaxState(stateStacks = listOf(StateStack(0, stack0, true)))
         val existingNameValidator = NewStackValidatorImpl(ranstaxState)
-        val stack1 = Stack(paddedName, 1)
+        val stack1 = Stack(name = paddedName, size = 1)
 
         assertEquals(
             StackValidation.Valid,

@@ -24,7 +24,7 @@ class ExistingStackValidatorTest {
 
     @Test
     fun givenANewStackValidatorThatDoesNotReturnNameExists_WhenValidated_ThenItReturnsTheValidation() {
-        val stack = Stack("name", 1)
+        val stack = Stack(name = "name", size = 1)
         StackValidation
             .values()
             .filterNot { it == StackValidation.NameExists }
@@ -48,7 +48,7 @@ class ExistingStackValidatorTest {
 
     @Test
     fun givenANewStackValidatorThatReturnsNameExistsForThisStack_WhenValidated_ThenItReturnsValid() {
-        val thisStack = Stack("name", 1)
+        val thisStack = Stack(name = "name", size = 1)
         val newStackValidator = createFakeNewStackValidator(StackValidation.NameExists)
         val existingStackValidator = ExistingStackValidator(thisStack, newStackValidator)
 
@@ -66,8 +66,8 @@ class ExistingStackValidatorTest {
 
     @Test
     fun givenANewStackValidatorThatReturnsNameExistsForAnotherStack_WhenValidated_ThenItReturnsNameExists() {
-        val thisStack = Stack("name", 1)
-        val anotherStack = Stack("another", 1)
+        val thisStack = Stack(name = "name", size = 1)
+        val anotherStack = Stack(name = "another", size = 1)
         val newStackValidator = createFakeNewStackValidator(StackValidation.NameExists)
         val existingStackValidator = ExistingStackValidator(thisStack, newStackValidator)
 

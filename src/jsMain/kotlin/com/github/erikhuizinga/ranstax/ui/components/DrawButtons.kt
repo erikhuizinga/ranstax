@@ -9,10 +9,7 @@ import org.jetbrains.compose.web.dom.H3
 import org.jetbrains.compose.web.dom.Text
 
 @Composable
-fun DrawButtons(
-    isDrawButtonEnabled: Boolean,
-    onDraw: (numberToDraw: Int) -> Unit,
-) {
+fun DrawButtons(canDraw: Boolean, onDraw: (numberToDraw: Int) -> Unit) {
     H3 {
         Text("🫳 Draw")
     }
@@ -23,7 +20,7 @@ fun DrawButtons(
                     if (number % 2 == 0) RanstaxStyle.numberButton0 else RanstaxStyle.numberButton1
                 classes(RanstaxStyle.largeButton, numberButtonClass)
 
-                if (isDrawButtonEnabled) onClick {
+                if (canDraw) onClick {
                     onDraw(number)
                 } else {
                     disabled()

@@ -21,7 +21,7 @@ fun StackEditor(
     stackValidator: Validator<Stack, StackValidation>,
 ) {
     Row {
-        var stack by remember { mutableStateOf(currentStack) }
+        var stack by remember(currentStack) { mutableStateOf(currentStack) }
         val stackValidation = stackValidator(stack)
 
         Button({
