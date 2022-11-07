@@ -54,9 +54,10 @@ fun History(ranstaxState: RanstaxState) {
                 }
                 drawActionStackNames.map { stackName ->
                     val indexString = (++index).toString()
-                    indexedNameTemplate.replace(
-                        indexTemplate, "0".repeat(indexLength - indexString.length) + indexString
-                    ).replace(nameTemplate, stackName)
+                    val padding = "0".repeat((indexLength - indexString.length).coerceAtLeast(0))
+                    indexedNameTemplate
+                        .replace(indexTemplate, padding + indexString)
+                        .replace(nameTemplate, stackName)
                 }.forEach {
                     Div {
                         Text(it)
