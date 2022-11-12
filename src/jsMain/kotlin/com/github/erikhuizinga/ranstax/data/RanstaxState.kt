@@ -11,31 +11,26 @@ data class RanstaxState(
     @Transient
     val isEditing: Boolean = false,
 ) {
-    @Transient
-    private val idGenerator = iterator {
-        var id = stateStacks.maxOfOrNull { it.id } ?: -1
-        while (true) yield(++id)
+    private val idGenerator by lazy {
+        iterator {
+            var id = stateStacks.maxOfOrNull { it.id } ?: -1
+            while (true) yield(++id)
+        }
     }
 
-    @Transient
-    val stacks: List<Stack> = stateStacks.map { it.stack }
+    val stacks: List<Stack> by lazy { stateStacks.map { it.stack } }
 
-    @Transient
-    val stacksBeingEdited = stateStacks.mapNotNull { stateStack ->
-        stateStack.stack.takeIf { stateStack.isBeingEdited }
+    val stacksBeingEdited by lazy {
+        stateStacks.mapNotNull { stateStack ->
+            stateStack.stack.takeIf { stateStack.isBeingEdited }
+        }
     }
 
-    @Transient
-    val hasStacks = stateStacks.isNotEmpty()
-
-    @Transient
-    val totalStackSize = stateStacks.sumOf { it.stack.size }
-
-    @Transient
-    val isEmpty = totalStackSize == 0
-
-    @Transient
-    val canDraw = !isEmpty && stacksBeingEdited.isEmpty()
+    val stacksNotBeingEdited by lazy { stacks - stacksBeingEdited.toSet() }
+    val hasStacks by lazy { stateStacks.isNotEmpty() }
+    val totalStackSize by lazy { stateStacks.sumOf { it.stack.size } }
+    val isEmpty by lazy { totalStackSize == 0 }
+    val canDraw by lazy { !isEmpty && stacksBeingEdited.isEmpty() }
 
     operator fun plus(newStack: Stack): RanstaxState = copy(
         stateStacks = stateStacks + StateStack(idGenerator.next(), newStack)

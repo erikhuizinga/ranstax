@@ -2,7 +2,7 @@ package com.github.erikhuizinga.ranstax.ui.components
 
 import androidx.compose.runtime.Composable
 import com.github.erikhuizinga.ranstax.data.RanstaxState
-import com.github.erikhuizinga.ranstax.domain.NewStackValidatorImpl
+import com.github.erikhuizinga.ranstax.domain.StackValidator
 import com.github.erikhuizinga.ranstax.ui.RanstaxStyle
 import kotlinx.browser.document
 import org.jetbrains.compose.web.dom.AttrBuilderContext
@@ -35,7 +35,7 @@ fun RanstaxApp(
         NewStackInput(
             onNewStack = { newStack -> onNewRanstaxStateTransform { this + newStack } },
             onEditingChange = onEditingChange,
-            stackValidator = NewStackValidatorImpl(ranstaxState),
+            stackValidator = StackValidator(ranstaxState.stacksNotBeingEdited.toSet()),
         )
         ClearButtonSection(
             ranstaxState.hasStacks || ranstaxState.drawnStackNames.isNotEmpty()

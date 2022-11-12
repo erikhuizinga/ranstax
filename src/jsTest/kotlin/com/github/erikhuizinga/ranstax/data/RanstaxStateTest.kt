@@ -58,4 +58,24 @@ class RanstaxStateTest {
 
         assertFalse(stack in replacedState.stacksBeingEdited)
     }
+
+    @Test
+    fun whenAStackIsBeingEdited_ThenItIsNotInStacksNotBeingEdited() {
+        val unexpected = Stack("unexpected", 0)
+        val ranstaxState = RanstaxState(
+            stateStacks = listOf(StateStack(0, unexpected, true))
+        )
+
+        assertFalse(unexpected in ranstaxState.stacksNotBeingEdited)
+    }
+
+    @Test
+    fun whenAStackIsNotBeingEdited_ThenItIsInStacksNotBeingEdited() {
+        val expected = Stack("expected", 0)
+        val ranstaxState = RanstaxState(
+            stateStacks = listOf(StateStack(0, expected, false))
+        )
+
+        assertTrue(expected in ranstaxState.stacksNotBeingEdited)
+    }
 }
