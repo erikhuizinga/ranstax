@@ -8,16 +8,8 @@ data class RanstaxState(
     val stateStacks: List<StateStack> = emptyList(),
     val drawnStackNames: List<List<String>> = emptyList(),
     /** `true` while the user is about to type anything, anywhere; `false` otherwise. */
-    @Transient
-    val isEditing: Boolean = false,
+    @Transient val isEditing: Boolean = false,
 ) {
-    private val idGenerator by lazy {
-        iterator {
-            var id = stateStacks.maxOfOrNull { it.id } ?: -1
-            while (true) yield(++id)
-        }
-    }
-
     val stacks: List<Stack> by lazy { stateStacks.map { it.stack } }
 
     val stacksBeingEdited by lazy {
@@ -32,13 +24,13 @@ data class RanstaxState(
     val isEmpty by lazy { totalStackSize == 0 }
     val canDraw by lazy { !isEmpty && stacksBeingEdited.isEmpty() }
 
-    operator fun plus(newStack: Stack): RanstaxState = copy(
-        stateStacks = stateStacks + StateStack(idGenerator.next(), newStack)
-    )
+    operator fun plus(newStack: Stack): RanstaxState {
+        val nextID = stateStacks.maxOfOrNull { it.id }?.plus(1) ?: 0
+        return copy(stateStacks = stateStacks + StateStack(nextID, newStack))
+    }
 
-    operator fun minus(stack: Stack): RanstaxState = copy(
-        stateStacks = stateStacks.filterNot { it.stack == stack }
-    )
+    operator fun minus(stack: Stack): RanstaxState =
+        copy(stateStacks = stateStacks.filterNot { it.stack == stack })
 
     fun replace(id: Int, stack: Stack) = replace(id) {
         copy(stack = stack)
@@ -48,9 +40,8 @@ data class RanstaxState(
         copy(isBeingEdited = isBeingEdited)
     }
 
-    private fun replace(id: Int, transform: StateStack.() -> StateStack) = copy(
-        stateStacks = stateStacks.map { if (it.id == id) it.transform() else it }
-    )
+    private fun replace(id: Int, transform: StateStack.() -> StateStack) =
+        copy(stateStacks = stateStacks.map { if (it.id == id) it.transform() else it })
 }
 
 @Serializable
