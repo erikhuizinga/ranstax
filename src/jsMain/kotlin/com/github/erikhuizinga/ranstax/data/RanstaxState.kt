@@ -41,16 +41,16 @@ data class RanstaxState(
         stateStacks = stateStacks + StateStack(idGenerator.next(), newStack)
     )
 
+    operator fun minus(stack: Stack): RanstaxState = copy(
+        stateStacks = stateStacks.filterNot { it.stack == stack }
+    )
+
     fun replace(id: Int, stack: Stack) = replace(id) {
         copy(stack = stack)
     }
 
     fun replace(id: Int, isBeingEdited: Boolean) = replace(id) {
         copy(isBeingEdited = isBeingEdited)
-    }
-
-    fun replace(id: Int, stack: Stack, isBeingEdited: Boolean) = replace(id) {
-        copy(stack = stack, isBeingEdited = isBeingEdited)
     }
 
     private fun replace(id: Int, transform: StateStack.() -> StateStack) = copy(

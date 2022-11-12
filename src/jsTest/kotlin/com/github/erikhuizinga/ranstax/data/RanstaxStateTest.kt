@@ -15,6 +15,16 @@ class RanstaxStateTest {
     }
 
     @Test
+    fun whenAStackIsSubtracted_ThenItIsNotInTheState() {
+        val unexpected = Stack("", 0)
+
+        val stateAfterSubtraction =
+            RanstaxState(stateStacks = listOf(StateStack(0, unexpected))) - unexpected
+
+        assertFalse(unexpected in stateAfterSubtraction.stacks)
+    }
+
+    @Test
     fun whenAStackIsReplaced_ThenItIsRemovedAndTheNewOneIsInTheState() {
         val stackToReplace = Stack("unexpected", 0)
         val expected = stackToReplace.copy(name = "expected")
@@ -47,19 +57,5 @@ class RanstaxStateTest {
         val replacedState = ranstaxState.replace(id, false)
 
         assertFalse(stack in replacedState.stacksBeingEdited)
-    }
-
-    @Test
-    fun whenAStackAndIsEditingAreReplacedForAnId_ThenTheCorrespondingStateReflectsThat() {
-        val stack = Stack("", 0)
-        val id = 0
-        val ranstaxState = RanstaxState(stateStacks = listOf(StateStack(id, stack, false)))
-        val expectedStack = Stack("expected", 1)
-
-        val replacedState = ranstaxState.replace(id, expectedStack, true)
-
-        assertTrue(expectedStack in replacedState.stacks)
-        assertFalse(stack in replacedState.stacks)
-        assertTrue(expectedStack in replacedState.stacksBeingEdited)
     }
 }

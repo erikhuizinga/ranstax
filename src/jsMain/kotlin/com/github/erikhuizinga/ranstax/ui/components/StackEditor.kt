@@ -1,10 +1,6 @@
 package com.github.erikhuizinga.ranstax.ui.components
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import com.github.erikhuizinga.ranstax.data.Stack
 import com.github.erikhuizinga.ranstax.domain.StackValidation
 import com.github.erikhuizinga.ranstax.domain.Validator
@@ -15,18 +11,18 @@ import org.jetbrains.compose.web.dom.Text
 @Composable
 fun StackEditor(
     currentStack: Stack,
-    onSave: (savedStack: Stack) -> Unit,
+    onSave: () -> Unit,
     onDelete: () -> Unit,
     onEditingChange: (isEditing: Boolean) -> Unit,
     stackValidator: Validator<Stack, StackValidation>,
+    onEdit: (Stack) -> Unit,
 ) {
     Row {
-        var stack by remember(currentStack) { mutableStateOf(currentStack) }
-        val stackValidation = stackValidator(stack)
+        val stackValidation = stackValidator(currentStack)
 
         Button({
             if (stackValidation == StackValidation.Valid) onClick {
-                onSave(stack.trimName())
+                onSave()
             } else {
                 disabled()
             }
@@ -37,11 +33,11 @@ fun StackEditor(
             Text("🗑")
         }
         StackInput(
-            stack = stack,
-            onInput = { stack = it },
+            stack = currentStack,
+            onInput = { onEdit(it) },
             onSubmit = {
                 if (stackValidation == StackValidation.Valid) {
-                    onSave(stack.trimName())
+                    onSave()
                 }
             },
             onEditingChange = onEditingChange,

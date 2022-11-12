@@ -31,21 +31,26 @@ fun StackList(
                 if (isBeingEdited) {
                     StackEditor(
                         currentStack = stackToRender,
-                        onSave = { savedStack ->
+                        onSave = {
                             onNewRanstaxStateTransform {
-                                replace(id = idToRender, stack = savedStack, isBeingEdited = false)
+                                replace(id = idToRender, isBeingEdited = false)
                             }
                         },
                         onDelete = {
                             onNewRanstaxStateTransform {
-                                copy(stateStacks = stateStacks.filterNot { it.id == idToRender })
+                                this - stackToRender
                             }
                         },
                         onEditingChange = onEditingChange,
                         stackValidator = ExistingStackValidator(
                             stackToRender,
                             NewStackValidatorImpl(ranstaxState),
-                        )
+                        ),
+                        onEdit = { editedStack ->
+                            onNewRanstaxStateTransform {
+                                replace(idToRender, editedStack)
+                            }
+                        },
                     )
                 } else {
                     EditableStackNameAndSize(stackToRender) {
