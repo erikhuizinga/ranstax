@@ -1,11 +1,13 @@
 on:
   push:
     paths-ignore:
+      - 'img/**'
       - '*.md'
     branches:
       - main
   pull_request:
     paths-ignore:
+      - 'img/**'
       - '*.md'
     branches:
       - main
