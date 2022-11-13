@@ -49,7 +49,7 @@ fun StackEditor(
         }
 
         stackValidation.hint?.also { hint ->
-            Text(hint)
+            SmallTextSpan(hint)
         }
     }
 }

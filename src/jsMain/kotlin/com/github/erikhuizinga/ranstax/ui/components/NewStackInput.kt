@@ -69,7 +69,7 @@ fun NewStackInput(
             }
 
             hintOrNull?.let { hint ->
-                Text(hint)
+                SmallTextSpan(hint)
             }
         }
     }
