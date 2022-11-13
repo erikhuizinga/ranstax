@@ -4,6 +4,8 @@
 
 https://erikhuizinga.github.io/ranstax/
 
+![Ranstax brand](img/ranstax-brand.png)
+
 ## About
 
 Many board games contain various sets or modules of items to be shuffled, like cards.
