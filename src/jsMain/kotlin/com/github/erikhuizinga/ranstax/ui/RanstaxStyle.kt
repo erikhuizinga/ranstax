@@ -238,7 +238,7 @@ object RanstaxStyle : StyleSheet() {
     }
     val numberButtonGrid by style {
         display(DisplayStyle.Grid)
-        gridTemplateColumns("1fr 1fr 1fr")
+        gridTemplateColumns("repeat(3, 1fr)")
         gap(mediumSize)
     }
     val numberButton0 by style {
