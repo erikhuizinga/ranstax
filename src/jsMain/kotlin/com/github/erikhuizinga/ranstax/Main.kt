@@ -37,7 +37,9 @@ fun main() {
             ranstaxState = newRanstaxState
         }
         Layout {
-            RanstaxHeader { classes(RanstaxStyle.header) }
+            RanstaxHeader(
+                rowAttrs = { classes(RanstaxStyle.headerRow) },
+                titleAttrs = { classes(RanstaxStyle.headerTitle) })
             RanstaxApp(
                 { classes(RanstaxStyle.mainContent) },
                 ranstaxState,

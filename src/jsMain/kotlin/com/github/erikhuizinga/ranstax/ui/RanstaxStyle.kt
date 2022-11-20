@@ -29,6 +29,7 @@ import org.jetbrains.compose.web.css.gap
 import org.jetbrains.compose.web.css.gridTemplateColumns
 import org.jetbrains.compose.web.css.height
 import org.jetbrains.compose.web.css.margin
+import org.jetbrains.compose.web.css.marginLeft
 import org.jetbrains.compose.web.css.maxHeight
 import org.jetbrains.compose.web.css.maxWidth
 import org.jetbrains.compose.web.css.minHeight
@@ -194,9 +195,7 @@ object RanstaxStyle : StyleSheet() {
             alignItems = AlignItems.Baseline,
         )
     }
-    val header by style {
-        titleFont()
-        fontSize(mediumFontSize * 4)
+    val headerRow by style {
         color(cream)
         backgroundColor(kellyGreen)
         paddingTop(mediumSize)
@@ -205,6 +204,14 @@ object RanstaxStyle : StyleSheet() {
         paddingRight(largeSize)
         width(100.percent)
         property("box-shadow", boxShadow)
+        self + "> a" style {
+            color(cream)
+            marginLeft(largeSize)
+        }
+    }
+    val headerTitle by style {
+        titleFont()
+        fontSize(mediumFontSize * 4)
     }
     val app by style {
         padding(mediumSize)
@@ -253,7 +260,7 @@ object RanstaxStyle : StyleSheet() {
     }
 
     init {
-        group(className(header), className(footer)) style {
+        group(className(headerTitle), className(footer)) style {
             flexGrow(0)
             flexShrink(0)
         }
