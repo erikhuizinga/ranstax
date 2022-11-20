@@ -128,7 +128,7 @@ object RanstaxStyle : StyleSheet() {
             roundBorder()
             property("box-shadow", boxShadow)
         }
-        type("button") + attr("disabled") style {
+        "button:disabled" style {
             opacity(0.3)
         }
         "button:hover:enabled" style {
