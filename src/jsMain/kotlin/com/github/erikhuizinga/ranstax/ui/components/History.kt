@@ -97,7 +97,7 @@ fun History(ranstaxState: RanstaxState, onReverseHistory: () -> Unit) {
         val position = if (ranstaxState.isMostRecentHistoryOnTop) "top" else "bottom"
         Text("Showing most recent history at the $position")
         Button({ onClick { onReverseHistory() } }) {
-            Text("🔃 reverse history")
+            Text("🔃 Reverse history")
         }
     }
 }
