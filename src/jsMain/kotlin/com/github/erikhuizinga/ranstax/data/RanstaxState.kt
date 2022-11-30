@@ -8,6 +8,7 @@ data class RanstaxState(
     val stateStacks: List<StateStack> = emptyList(),
     val drawnStackNames: List<List<String>> = emptyList(),
     private val savedStacks: List<Stack>? = null,
+    val isMostRecentHistoryOnTop: Boolean = true,
     /** `true` while the user is about to type anything, anywhere; `false` otherwise. */
     @Transient val isEditing: Boolean = false,
 ) {

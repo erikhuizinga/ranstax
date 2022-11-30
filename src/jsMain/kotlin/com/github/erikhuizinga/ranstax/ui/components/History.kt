@@ -32,11 +32,16 @@ fun History(ranstaxState: RanstaxState) {
             )
         }) {
             DisposableEffect(drawnStackNames.size) {
-                fun scrollToEnd() {
-                    scopeElement.apply { scrollTop = scrollHeight.toDouble() }
+                fun scrollToMostRecentEdge() {
+                    scopeElement.apply {
+                        scrollTop = when (ranstaxState.isMostRecentHistoryOnTop) {
+                            true -> 0.0
+                            false -> scrollHeight.toDouble()
+                        }
+                    }
                 }
-                window.onresize = { scrollToEnd() }
-                scrollToEnd()
+                window.onresize = { scrollToMostRecentEdge() }
+                scrollToMostRecentEdge()
                 onDispose {}
             }
 
@@ -49,26 +54,39 @@ fun History(ranstaxState: RanstaxState) {
                 )
             ).roundToInt()
             var index = 0
-            drawnStackNames.forEachIndexed { drawActionIndex, drawActionStackNames ->
+            val historyEntries = drawnStackNames.map { drawActionStackNames ->
+                "Drew ${drawActionStackNames.size} 👇" to
+                        drawActionStackNames.map { stackName ->
+                            val indexString = (++index).toString()
+                            val padding =
+                                "0".repeat((indexLength - indexString.length).coerceAtLeast(0))
+                            indexedNameTemplate
+                                .replace(indexTemplate, padding + indexString)
+                                .replace(nameTemplate, stackName)
+                        }
+            }
+            if (ranstaxState.isMostRecentHistoryOnTop) {
+                historyEntries.reversed()
+            } else {
+                historyEntries
+            }.forEachIndexed { drawActionIndex, (header, body) ->
+                val actualIndex = if (ranstaxState.isMostRecentHistoryOnTop) {
+                    historyEntries.lastIndex - drawActionIndex
+                } else {
+                    drawActionIndex
+                }
                 Div({
                     classes(
                         RanstaxStyle.historyEntry,
-                        if (drawActionIndex % 2 == 0) {
+                        if (actualIndex % 2 == 0) {
                             RanstaxStyle.darkBackground
                         } else {
                             RanstaxStyle.lightBackground
                         }
                     )
                 }) {
-                    Text("Drew ${drawActionStackNames.size} 👇")
-                    drawActionStackNames.map { stackName ->
-                        val indexString = (++index).toString()
-                        val padding =
-                            "0".repeat((indexLength - indexString.length).coerceAtLeast(0))
-                        indexedNameTemplate
-                            .replace(indexTemplate, padding + indexString)
-                            .replace(nameTemplate, stackName)
-                    }.forEach {
+                    Text(header)
+                    body.forEach {
                         Br()
                         Text(it)
                     }
