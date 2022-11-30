@@ -63,10 +63,10 @@ object RanstaxStyle : StyleSheet() {
     private fun RGBTriple.map(transform: (Int) -> Int) =
         RGBTriple(transform(first), transform(second), transform(third))
 
-    private val RGBTriple.darker get() = map { (it / 1.2).roundToInt() }
+    private val RGBTriple.darker get() = map { (it / 1.1).roundToInt() }
 
     //region Theme colors: https://www.canva.com/colors/color-palettes/random-market-finds/
-    private val cream = Color("#F6F4E7")
+    private val cream: CSSColorValue
     private val gray = Color("#7C847F")
     private val cognac: CSSColorValue
     private val kellyGreen = Color("#69914D")
@@ -76,14 +76,20 @@ object RanstaxStyle : StyleSheet() {
     private val cognacDark1: CSSColorValue
     private val cognacDark2: CSSColorValue
 
+    private val creamDark0: CSSColorValue
+
     init {
         val cognacRGBTriple = RGBTriple(147, 121, 101)
         cognac = cognacRGBTriple.color
-        val cognacDark0Triple = cognacRGBTriple.darker
+        val cognacDark0Triple = cognacRGBTriple.darker.darker
         cognacDark0 = cognacDark0Triple.color
-        val cognacDark1Triple = cognacDark0Triple.darker
+        val cognacDark1Triple = cognacDark0Triple.darker.darker
         cognacDark1 = cognacDark1Triple.color
-        cognacDark2 = cognacDark1Triple.darker.color
+        cognacDark2 = cognacDark1Triple.darker.darker.color
+
+        val creamRGBTriple = RGBTriple(0xf6, 0xf4, 0xe7)
+        cream = creamRGBTriple.color
+        creamDark0 = creamRGBTriple.darker.color
     }
 
     private val buttonHoverColor by variable<CSSColorValue>()
