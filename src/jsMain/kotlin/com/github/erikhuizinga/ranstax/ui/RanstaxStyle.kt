@@ -237,11 +237,19 @@ object RanstaxStyle : StyleSheet() {
         border(1.px, LineStyle.Solid, gray)
     }
     val history by style {
-        padding(mediumSize)
         maxHeight(20.vh)
         minHeight(14.em)
         overflowY("scroll")
         fontSize(mediumLargeFontSize)
+    }
+    val historyEntry by style {
+        padding(mediumSize)
+    }
+    val lightBackground by style {
+        backgroundColor(cream)
+    }
+    val darkBackground by style {
+        backgroundColor(creamDark0)
     }
     val largeButton by style {
         padding(largeSize)
