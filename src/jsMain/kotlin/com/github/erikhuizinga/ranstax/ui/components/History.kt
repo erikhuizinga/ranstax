@@ -9,12 +9,13 @@ import kotlin.math.log10
 import kotlin.math.roundToInt
 import kotlinx.browser.window
 import org.jetbrains.compose.web.dom.Br
+import org.jetbrains.compose.web.dom.Button
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.H3
 import org.jetbrains.compose.web.dom.Text
 
 @Composable
-fun History(ranstaxState: RanstaxState) {
+fun History(ranstaxState: RanstaxState, onReverseHistory: () -> Unit) {
     Column {
         val drawnStackNames = ranstaxState.drawnStackNames
         H3 {
@@ -31,7 +32,7 @@ fun History(ranstaxState: RanstaxState) {
                 RanstaxStyle.visibleBorder,
             )
         }) {
-            DisposableEffect(drawnStackNames.size) {
+            DisposableEffect(drawnStackNames.size, ranstaxState.isMostRecentHistoryOnTop) {
                 fun scrollToMostRecentEdge() {
                     scopeElement.apply {
                         scrollTop = when (ranstaxState.isMostRecentHistoryOnTop) {
@@ -92,6 +93,11 @@ fun History(ranstaxState: RanstaxState) {
                     }
                 }
             }
+        }
+        val position = if (ranstaxState.isMostRecentHistoryOnTop) "top" else "bottom"
+        Text("Showing most recent history at the $position")
+        Button({ onClick { onReverseHistory() } }) {
+            Text("🔃 reverse history")
         }
     }
 }

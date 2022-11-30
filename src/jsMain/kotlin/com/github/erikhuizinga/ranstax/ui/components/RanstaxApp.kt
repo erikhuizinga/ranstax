@@ -30,7 +30,11 @@ fun RanstaxApp(
         attrs?.invoke(this)
     }) {
         Controls(ranstaxState, onNewRanstaxStateTransform)
-        History(ranstaxState)
+        History(ranstaxState) {
+            onNewRanstaxStateTransform {
+                copy(isMostRecentHistoryOnTop = !isMostRecentHistoryOnTop)
+            }
+        }
         StackList(ranstaxState, onNewRanstaxStateTransform, onEditingChange)
         NewStackInput(
             onNewStack = { newStack -> onNewRanstaxStateTransform { this + newStack } },
