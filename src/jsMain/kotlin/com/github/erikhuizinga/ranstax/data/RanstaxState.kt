@@ -7,6 +7,7 @@ import kotlinx.serialization.Transient
 data class RanstaxState(
     val stateStacks: List<StateStack> = emptyList(),
     val drawnStackNames: List<List<String>> = emptyList(),
+    private val savedStacks: List<Stack>? = null,
     /** `true` while the user is about to type anything, anywhere; `false` otherwise. */
     @Transient val isEditing: Boolean = false,
 ) {
@@ -23,6 +24,7 @@ data class RanstaxState(
     val totalStackSize by lazy { stateStacks.sumOf { it.stack.size } }
     val isEmpty by lazy { totalStackSize == 0 }
     val canDraw by lazy { !isEmpty && stacksBeingEdited.isEmpty() }
+    val hasSavedStacks by lazy { savedStacks != null }
 
     operator fun plus(newStack: Stack): RanstaxState {
         val nextID = stateStacks.maxOfOrNull { it.id }?.plus(1) ?: 0
@@ -42,6 +44,15 @@ data class RanstaxState(
 
     private fun replace(id: Int, transform: StateStack.() -> StateStack) =
         copy(stateStacks = stateStacks.map { if (it.id == id) it.transform() else it })
+
+    fun saveStacks() = copy(savedStacks = stacks)
+    fun loadStacks() = savedStacks
+        ?.let { savedStacks ->
+            copy(stateStacks = savedStacks.mapIndexed { index, stack -> StateStack(index, stack) })
+        }
+        ?: this
+
+    fun clearHistory() = copy(drawnStackNames = emptyList())
 }
 
 @Serializable

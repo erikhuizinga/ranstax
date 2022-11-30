@@ -37,8 +37,13 @@ fun RanstaxApp(
             onEditingChange = onEditingChange,
             stackValidator = StackValidator(ranstaxState.stacksNotBeingEdited.toSet()),
         )
-        ClearButtonSection(
-            ranstaxState.hasStacks || ranstaxState.drawnStackNames.isNotEmpty()
-        ) { onNewRanstaxStateTransform { RanstaxState() } }
+        StateButtons(
+            onSaveStacks = { onNewRanstaxStateTransform { ranstaxState.saveStacks() } },
+            canLoad = ranstaxState.hasSavedStacks,
+            onLoad = { onNewRanstaxStateTransform { ranstaxState.loadStacks() } },
+            onClearHistory = { onNewRanstaxStateTransform { ranstaxState.clearHistory() } },
+            canClear = ranstaxState.hasStacks || ranstaxState.drawnStackNames.isNotEmpty(),
+            onClear = { onNewRanstaxStateTransform { RanstaxState() } },
+        )
     }
 }
