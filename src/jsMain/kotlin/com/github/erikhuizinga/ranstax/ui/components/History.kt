@@ -8,6 +8,7 @@ import kotlin.math.ceil
 import kotlin.math.log10
 import kotlin.math.roundToInt
 import kotlinx.browser.window
+import org.jetbrains.compose.web.dom.Br
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.H3
 import org.jetbrains.compose.web.dom.Text
@@ -48,18 +49,27 @@ fun History(ranstaxState: RanstaxState) {
                 )
             ).roundToInt()
             var index = 0
-            drawnStackNames.forEach { drawActionStackNames ->
-                Div {
+            drawnStackNames.forEachIndexed { drawActionIndex, drawActionStackNames ->
+                Div({
+                    classes(
+                        RanstaxStyle.historyEntry,
+                        if (drawActionIndex % 2 == 0) {
+                            RanstaxStyle.darkBackground
+                        } else {
+                            RanstaxStyle.lightBackground
+                        }
+                    )
+                }) {
                     Text("Drew ${drawActionStackNames.size} 👇")
-                }
-                drawActionStackNames.map { stackName ->
-                    val indexString = (++index).toString()
-                    val padding = "0".repeat((indexLength - indexString.length).coerceAtLeast(0))
-                    indexedNameTemplate
-                        .replace(indexTemplate, padding + indexString)
-                        .replace(nameTemplate, stackName)
-                }.forEach {
-                    Div {
+                    drawActionStackNames.map { stackName ->
+                        val indexString = (++index).toString()
+                        val padding =
+                            "0".repeat((indexLength - indexString.length).coerceAtLeast(0))
+                        indexedNameTemplate
+                            .replace(indexTemplate, padding + indexString)
+                            .replace(nameTemplate, stackName)
+                    }.forEach {
+                        Br()
                         Text(it)
                     }
                 }
