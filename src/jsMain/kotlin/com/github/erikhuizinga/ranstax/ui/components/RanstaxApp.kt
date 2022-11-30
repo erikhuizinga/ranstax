@@ -37,7 +37,7 @@ fun RanstaxApp(
             onEditingChange = onEditingChange,
             stackValidator = StackValidator(ranstaxState.stacksNotBeingEdited.toSet()),
         )
-        StateButtons(
+        StateControls(
             onSaveStacks = { onNewRanstaxStateTransform { ranstaxState.saveStacks() } },
             canLoad = ranstaxState.hasSavedStacks,
             onLoad = { onNewRanstaxStateTransform { ranstaxState.loadStacks() } },

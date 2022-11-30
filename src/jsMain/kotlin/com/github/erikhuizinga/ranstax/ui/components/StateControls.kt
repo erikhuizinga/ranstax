@@ -9,7 +9,7 @@ import org.jetbrains.compose.web.dom.H3
 import org.jetbrains.compose.web.dom.Text
 
 @Composable
-fun StateButtons(
+fun StateControls(
     onSaveStacks: () -> Unit,
     canLoad: Boolean,
     onLoad: () -> Unit,
