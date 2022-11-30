@@ -102,6 +102,7 @@ object RanstaxStyle : StyleSheet() {
 
     private val mediumFontSize = 1.em
     private val smallFontSize = mediumFontSize / 12 * 10
+    private val mediumLargeFontSize = mediumFontSize / 10 * 12
     private val largeFontSize = mediumFontSize * 2
     //endregion
 
@@ -234,6 +235,7 @@ object RanstaxStyle : StyleSheet() {
         maxHeight(20.vh)
         minHeight(14.em)
         overflowY("scroll")
+        fontSize(mediumLargeFontSize)
     }
     val largeButton by style {
         padding(largeSize)
