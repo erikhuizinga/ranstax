@@ -29,7 +29,7 @@ fun RanstaxApp(
         classes(RanstaxStyle.app)
         attrs?.invoke(this)
     }) {
-        Controls(ranstaxState, onNewRanstaxStateTransform)
+        DrawControls(ranstaxState, onNewRanstaxStateTransform)
         History(ranstaxState) {
             onNewRanstaxStateTransform {
                 copy(isMostRecentHistoryOnTop = !isMostRecentHistoryOnTop)

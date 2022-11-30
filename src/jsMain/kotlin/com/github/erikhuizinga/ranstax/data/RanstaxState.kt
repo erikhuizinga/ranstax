@@ -11,6 +11,7 @@ data class RanstaxState(
     val isMostRecentHistoryOnTop: Boolean = true,
     /** `true` while the user is about to type anything, anywhere; `false` otherwise. */
     @Transient val isEditing: Boolean = false,
+    @Transient val timeOfLastDraw: Double = 0.0,
 ) {
     val stacks: List<Stack> by lazy { stateStacks.map { it.stack } }
 

@@ -2,11 +2,12 @@ package com.github.erikhuizinga.ranstax.ui.components
 
 import androidx.compose.runtime.Composable
 import com.github.erikhuizinga.ranstax.data.RanstaxState
+import kotlin.js.Date
 import kotlin.math.min
 import kotlin.random.Random
 
 @Composable
-fun Controls(
+fun DrawControls(
     ranstaxState: RanstaxState,
     onNewRanstaxStateTransform: (RanstaxState.() -> RanstaxState) -> Unit,
 ) {
@@ -23,6 +24,8 @@ fun onDraw(
     ranstaxState: RanstaxState,
     onNewRanstaxStateTransform: (RanstaxState.() -> RanstaxState) -> Unit,
 ) {
+    if ((Date.now() - ranstaxState.timeOfLastDraw) < 200) return
+
     var newRanstaxState = ranstaxState
     val theNumToDraw = min(numberToDraw, ranstaxState.totalStackSize)
     val drawnStackNames = mutableListOf<String>()
@@ -37,7 +40,8 @@ fun onDraw(
         drawnStackNames += drawnStack.name
     }
     newRanstaxState = newRanstaxState.copy(
-        drawnStackNames = newRanstaxState.drawnStackNames + listOf(drawnStackNames)
+        drawnStackNames = newRanstaxState.drawnStackNames + listOf(drawnStackNames),
+        timeOfLastDraw = Date.now(),
     )
     onNewRanstaxStateTransform { newRanstaxState }
 }
