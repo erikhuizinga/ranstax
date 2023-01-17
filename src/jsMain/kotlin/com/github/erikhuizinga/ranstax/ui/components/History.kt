@@ -4,15 +4,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import com.github.erikhuizinga.ranstax.data.RanstaxState
 import com.github.erikhuizinga.ranstax.ui.RanstaxStyle
-import kotlin.math.ceil
-import kotlin.math.log10
-import kotlin.math.roundToInt
 import kotlinx.browser.window
-import org.jetbrains.compose.web.dom.Br
 import org.jetbrains.compose.web.dom.Button
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.H3
+import org.jetbrains.compose.web.dom.Li
 import org.jetbrains.compose.web.dom.Text
+import org.jetbrains.compose.web.dom.Ul
 
 @Composable
 fun History(ranstaxState: RanstaxState, onReverseHistory: () -> Unit) {
@@ -46,25 +44,17 @@ fun History(ranstaxState: RanstaxState, onReverseHistory: () -> Unit) {
                 onDispose {}
             }
 
-            val indexTemplate = "\$index"
-            val nameTemplate = "\$name"
-            val indexedNameTemplate = "$indexTemplate: $nameTemplate"
-            val indexLength = ceil(
-                log10(
-                    (ranstaxState.totalStackSize + drawnStackNames.sumOf { it.size } + 1).toDouble()
-                )
-            ).roundToInt()
             var index = 0
             val historyEntries = drawnStackNames.map { drawActionStackNames ->
-                "Drew ${drawActionStackNames.size} 👇" to
-                        drawActionStackNames.map { stackName ->
-                            val indexString = (++index).toString()
-                            val padding =
-                                "0".repeat((indexLength - indexString.length).coerceAtLeast(0))
-                            indexedNameTemplate
-                                .replace(indexTemplate, padding + indexString)
-                                .replace(nameTemplate, stackName)
-                        }
+                "${++index}: drew ${drawActionStackNames.size} 👇" to
+                        drawActionStackNames
+                            .groupingBy { it }
+                            .eachCount()
+                            .entries
+                            .sortedBy { (drawnStackName) ->
+                                ranstaxState.stacks.map { it.name }.indexOf(drawnStackName)
+                            }
+                            .map { (stackName, count) -> "$count from $stackName" }
             }
             if (ranstaxState.isMostRecentHistoryOnTop) {
                 historyEntries.reversed()
@@ -87,9 +77,12 @@ fun History(ranstaxState: RanstaxState, onReverseHistory: () -> Unit) {
                     )
                 }) {
                     Text(header)
-                    body.forEach {
-                        Br()
-                        Text(it)
+                    Ul {
+                        body.forEach {
+                            Li {
+                                Text(it)
+                            }
+                        }
                     }
                 }
             }
