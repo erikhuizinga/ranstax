@@ -32,7 +32,7 @@ jobs:
         uses: gradle/gradle-build-action@v2
         with:
           arguments:
-            build
+            build --continue
       - name: Upload GitHub Pages artifact
         uses: actions/upload-pages-artifact@v1
         with:
