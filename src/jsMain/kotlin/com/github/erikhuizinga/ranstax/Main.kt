@@ -14,6 +14,7 @@ import com.github.erikhuizinga.ranstax.ui.components.Layout
 import com.github.erikhuizinga.ranstax.ui.components.RanstaxApp
 import com.github.erikhuizinga.ranstax.ui.components.RanstaxHeader
 import kotlinx.browser.localStorage
+import kotlinx.browser.window
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -48,6 +49,16 @@ fun main() {
             Footer { classes(RanstaxStyle.footer) }
         }
     }
+
+    window.navigator.serviceWorker
+        .register("/sw.js")
+        .then {
+            log("Service worker registered")
+        }
+        .catch { throwable ->
+            log("Service worker registration failed")
+            log(throwable)
+        }
 }
 
 private const val RANSTAX_STATE_KEY = "RanstaxState"
