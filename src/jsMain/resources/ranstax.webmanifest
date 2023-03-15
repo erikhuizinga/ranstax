@@ -1,0 +1,15 @@
+{
+  "name": "Ranstax",
+  "short_name": "Ranstax",
+  "description": "Random item picker from named stacks of known size",
+  "icons": [
+    {
+      "src": "favicon.ico",
+      "sizes": "32x32",
+      "type": "image/x-icon"
+    }
+  ],
+  "start_url": "index.html",
+  "display": "fullscreen",
+  "background_color": "#F6F4E7"
+}
