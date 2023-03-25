@@ -50,15 +50,19 @@ fun main() {
         }
     }
 
-    window.navigator.serviceWorker
-        .register("/sw.js")
-        .then {
-            log("Service worker registered")
-        }
-        .catch { throwable ->
-            log("Service worker registration failed")
-            log(throwable)
-        }
+    if (DEV) {
+        window
+            .navigator
+            .serviceWorker
+            .register("/ranstax-service-worker.js")
+            .then {
+                log("Service worker registered")
+            }
+            .catch { throwable ->
+                log("Service worker registration failed")
+                log(throwable)
+            }
+    }
 }
 
 private const val RANSTAX_STATE_KEY = "RanstaxState"
