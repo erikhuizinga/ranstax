@@ -7,6 +7,7 @@ import kotlinx.browser.document
 import org.w3c.dom.url.URLSearchParams
 
 val DEV = URLSearchParams(document.location?.search).get("dev").toBoolean()
+    .also { if (it) log("Dev mode enabled") }
 
 fun setupDevRanstaxState(ranstaxState: RanstaxState) =
     if (ranstaxState.isEmpty) {
