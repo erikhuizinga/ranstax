@@ -54,7 +54,7 @@ fun main() {
         window
             .navigator
             .serviceWorker
-            .register("/ranstax-service-worker.js")
+            .register("/service-worker.js")
             .then {
                 log("Service worker registered")
             }
