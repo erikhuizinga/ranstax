@@ -1,7 +1,11 @@
 self.addEventListener('install', (e) => {
   e.waitUntil(
     caches.open('ranstax-store').then((cache) => cache.addAll([
-      '/favicon.ico',
+      '/ico/ranstax32px.png',
+      '/ico/ranstax48px.png',
+      '/ico/ranstax64px.png',
+      '/ico/ranstax96px.png',
+      '/ico/ranstax128px.png',
       '/index.html',
       '/ranstax.js',
     ])),
