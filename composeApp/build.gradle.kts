@@ -3,8 +3,8 @@ import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
-
     alias(libs.plugins.jetbrainsCompose)
+    id("io.gitlab.arturbosch.detekt")
 }
 
 kotlin {
@@ -33,4 +33,17 @@ kotlin {
 
 compose.experimental {
     web.application {}
+}
+
+detekt {
+    config.setFrom(project.rootProject.projectDir.path + "/config/detekt/detekt.yml")
+    source.setFrom(
+        kotlin.sourceSets.flatMap { kotlinSourceSet ->
+            kotlinSourceSet.kotlin.srcDirs
+        }.toSet()
+    )
+}
+
+tasks.check {
+    dependsOn("detekt")
 }

@@ -9,6 +9,8 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 
+private const val HELLO_WORLD_COUNT = 100
+
 @Composable
 fun App() {
     MaterialTheme {
@@ -25,7 +27,7 @@ fun App() {
             },
         ) { innerPadding ->
             LazyColumn(modifier = Modifier.padding(innerPadding).fillMaxWidth()) {
-                repeat(100) {
+                repeat(HELLO_WORLD_COUNT) {
                     item {
                         Text("Hello, World! $it")
                     }
