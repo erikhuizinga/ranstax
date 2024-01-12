@@ -15,6 +15,12 @@ kotlin {
             commonWebpackConfig {
                 outputFileName = "composeApp.js"
             }
+            testTask {
+                useKarma {
+                    useChromeHeadless()
+                    useConfigDirectory(project.projectDir.resolve("karma.config.d").resolve("wasm"))
+                }
+            }
         }
         binaries.executable()
     }
