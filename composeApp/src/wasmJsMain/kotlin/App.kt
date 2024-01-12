@@ -1,5 +1,6 @@
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.BottomAppBar
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
@@ -23,8 +24,12 @@ fun App() {
                 }
             },
         ) { innerPadding ->
-            Box(modifier = Modifier.padding(innerPadding)) {
-                Text("Hello, World!")
+            LazyColumn(modifier = Modifier.padding(innerPadding).fillMaxWidth()) {
+                repeat(100) {
+                    item {
+                        Text("Hello, World! $it")
+                    }
+                }
             }
         }
     }
