@@ -1,3 +1,5 @@
+package com.github.erikhuizinga.ranstax.ui
+
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
