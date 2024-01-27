@@ -1,9 +1,8 @@
-@file:Suppress("unused")
-
 package com.github.erikhuizinga.ranstax.firebase
 
 import kotlin.js.Promise
 
+@Suppress("UnusedParameter")
 @JsModule("firebase/firestore")
 external object Firestore : JsAny {
     fun getFirestore(): FirebaseFirestore
