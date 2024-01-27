@@ -37,8 +37,10 @@ kotlin {
         commonTest.dependencies {
             implementation(kotlin("test"))
         }
-        getByName("wasmJsMain").dependencies {
-            implementation(npm("firebase", "10.7.1"))
+        getByName("wasmJsMain").run {
+            dependencies {
+                implementation(npm("firebase", "10.7.1"))
+            }
         }
     }
 }
