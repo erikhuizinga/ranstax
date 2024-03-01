@@ -35,7 +35,7 @@ fun App() {
                     Modifier.padding(innerPadding)
                 ) {
                     devPrintln("Box content")
-                    documentContent()
+                    DocumentContent()
                 }
             },
             bottomBar = {
@@ -48,7 +48,7 @@ fun App() {
 }
 
 @Composable
-private fun documentContent() {
+private fun DocumentContent() {
     val firebaseFirestore = Firestore.getFirestore()
     devPrintln("firebaseFirestore")
     firebaseFirestore.propertyNames.forEachIndexed { index, key ->
@@ -65,11 +65,11 @@ private fun documentContent() {
     devPrintln("documentReference")
     documentReference.propertyNames.forEachIndexed { index, key ->
         devPrintln("key[$index] = $key")
-        devPrintln("type = ${documentReference.type}")
-        devPrintln("id = ${documentReference.id}")
-        devPrintln("path = ${documentReference.path}")
-        devPrintln("parent = ${documentReference.parent}")
     }
+    devPrintln("type = ${documentReference.type}")
+    devPrintln("id = ${documentReference.id}")
+    devPrintln("path = ${documentReference.path}")
+    devPrintln("parent = ${documentReference.parent}")
 
     val documentReferencesPromise = Firestore.getDocs(collectionReference)
     devPrintln("documentReferencesPromise")
@@ -82,11 +82,21 @@ private fun documentContent() {
     var documentReferences by remember { mutableStateOf(emptyList<DocumentReference>()) }
 
     if (loading) {
+        devPrintln("Text(\"Loading...\")")
         Text("Loading...")
     } else {
+        devPrintln("LazyColumn")
         LazyColumn {
+            item {
+                Text("Document references:")
+            }
+            devPrintln("there are ${documentReferences.size} document references")
+            devPrintln("documentReferences = ${documentReferences.joinToString()}")
             items(documentReferences) { documentReference ->
                 Text("documentReference = $documentReference")
+            }
+            item {
+                Text("End of document references.")
             }
         }
     }
