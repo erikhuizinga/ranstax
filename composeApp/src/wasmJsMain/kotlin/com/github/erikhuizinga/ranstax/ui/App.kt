@@ -50,20 +50,20 @@ fun App() {
 @Composable
 private fun documentContent() {
     val firebaseFirestore = Firestore.getFirestore()
+    devPrintln("firebaseFirestore")
     firebaseFirestore.propertyNames.forEachIndexed { index, key ->
-        devPrintln("firebaseFirestore")
         devPrintln("key[$index] = $key")
     }
 
     val collectionReference = Firestore.collection(firebaseFirestore, "stacks")
+    devPrintln("collectionReference")
     collectionReference.propertyNames.forEachIndexed { index, key ->
-        devPrintln("collectionReference")
         devPrintln("key[$index] = $key")
     }
 
     val documentReference = Firestore.doc(firebaseFirestore, "/stacks/wingspan base + ss")
+    devPrintln("documentReference")
     documentReference.propertyNames.forEachIndexed { index, key ->
-        devPrintln("documentReference")
         devPrintln("key[$index] = $key")
         devPrintln("type = ${documentReference.type}")
         devPrintln("id = ${documentReference.id}")
@@ -72,8 +72,8 @@ private fun documentContent() {
     }
 
     val documentReferencesPromise = Firestore.getDocs(collectionReference)
+    devPrintln("documentReferencesPromise")
     documentReferencesPromise.propertyNames.forEachIndexed { index, key ->
-        devPrintln("documentReferencesPromise")
         devPrintln("key[$index] = $key")
     }
 
