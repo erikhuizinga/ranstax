@@ -58,6 +58,10 @@ detekt {
     )
 }
 
+tasks.detekt {
+    mustRunAfter("generateComposeResClass")
+}
+
 tasks.check {
     dependsOn("detekt")
 }
