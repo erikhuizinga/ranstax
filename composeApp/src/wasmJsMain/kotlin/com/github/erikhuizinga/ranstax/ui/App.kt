@@ -87,16 +87,22 @@ private fun DocumentContent() {
     } else {
         devPrintln("LazyColumn")
         LazyColumn {
-            item {
-                Text("Document references:")
-            }
             devPrintln("there are ${documentReferences.size} document references")
-            devPrintln("documentReferences = ${documentReferences.joinToString()}")
-            items(documentReferences) { documentReference ->
-                Text("documentReference = $documentReference")
-            }
-            item {
-                Text("End of document references.")
+            if (documentReferences.isEmpty()) {
+                item {
+                    Text("No document references.")
+                }
+            } else {
+                devPrintln("documentReferences = ${documentReferences.joinToString()}")
+                item {
+                    Text("Document references:")
+                }
+                items(documentReferences) { documentReference ->
+                    Text("documentReference = $documentReference")
+                }
+                item {
+                    Text("End of document references.")
+                }
             }
         }
     }
